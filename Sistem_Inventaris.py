@@ -31,4 +31,18 @@ menu = st.sidebar.selectbox("Menu", [
 
 # Load data
 alat_data = load_data(FILE_ALAT, ["Nama Alat", "Jumlah", "Lokasi", "Kondisi"])
-bahan_data = load_data(FILE_BAHAN, ["Nama Bahan", "Jumlah Awal", "
+bahan_data = load_data(FILE_BAHAN, ["Nama Bahan", "Jumlah Awal", "Jumlah Terpakai", "Sisa", "Lokasi", "Kondisi"])
+
+# Menu: Lihat Inventaris
+if menu == "Lihat Inventaris":
+    st.subheader("🔧 Alat Laboratorium")
+    st.dataframe(alat_data)
+
+    st.subheader("🧫 Bahan Kimia")
+    st.dataframe(bahan_data)
+
+# Menu: Tambah Alat Lab
+elif menu == "Tambah Alat Lab":
+    st.subheader("➕ Tambah Alat Lab")
+    nama = st.text_input("Nama Alat")
+    jumlah = st.number_input
