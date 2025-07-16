@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import os
@@ -11,47 +12,48 @@ RIWAYAT_FILE = os.path.join(DATA_DIR, "riwayat_penggunaan.csv")
 
 # Load data
 def load_data():
+    os.makedirs(DATA_DIR, exist_ok=True)
+    if not os.path.exists(ALAT_FILE):
+        pd.DataFrame(columns=["Nama Alat", "Jumlah", "Tempat Penyimpanan"]).to_csv(ALAT_FILE, index=False)
+    if not os.path.exists(BAHAN_FILE):
+        pd.DataFrame(columns=["Nama Bahan", "Jumlah", "Tanggal Expired", "Tempat Penyimpanan"]).to_csv(BAHAN_FILE, index=False)
+    if not os.path.exists(RIWAYAT_FILE):
+        pd.DataFrame(columns=["Nama", "Kategori", "Jumlah Digunakan", "Tanggal", "Digunakan Oleh", "Keperluan"]).to_csv(RIWAYAT_FILE, index=False)
+
     alat_df = pd.read_csv(ALAT_FILE)
     bahan_df = pd.read_csv(BAHAN_FILE)
     riwayat_df = pd.read_csv(RIWAYAT_FILE)
     return alat_df, bahan_df, riwayat_df
 
-# Simpan data
-def save_data(df, file_path):
-    df.to_csv(file_path, index=False)
+st.title("馃搾 Logbook Inventarisasi Laboratorium Kimia")
 
-st.title("📒 Logbook Inventarisasi Laboratorium Kimia")
-
-# Menu sidebar
 menu = st.sidebar.selectbox("Menu", ["Stok Alat", "Stok Bahan", "Riwayat Penggunaan", "Tambah Data"])
 
 alat_df, bahan_df, riwayat_df = load_data()
 
 if menu == "Stok Alat":
-    st.header("📌 Stok Alat Laboratorium")
+    st.header("馃搶 Stok Alat Laboratorium")
     st.dataframe(alat_df)
-    with st.expander("🔍 Cari Alat"):
+    with st.expander("馃攳 Cari Alat"):
         search = st.text_input("Nama alat:")
         filtered = alat_df[alat_df["Nama Alat"].str.contains(search, case=False)]
         st.dataframe(filtered)
 
 elif menu == "Stok Bahan":
-    st.header("🧪 Stok Bahan Kimia")
+    st.header("馃И Stok Bahan Kimia")
     st.dataframe(bahan_df)
-    with st.expander("🔍 Cari Bahan"):
+    with st.expander("馃攳 Cari Bahan"):
         search = st.text_input("Nama bahan:")
         filtered = bahan_df[bahan_df["Nama Bahan"].str.contains(search, case=False)]
         st.dataframe(filtered)
 
 elif menu == "Riwayat Penggunaan":
-    st.header("📝 Riwayat Penggunaan Alat dan Bahan")
+    st.header("馃摑 Riwayat Penggunaan Alat dan Bahan")
     st.dataframe(riwayat_df)
 
 elif menu == "Tambah Data":
-    st.header("➕ Tambah Data Inventaris")
-
+    st.header("鉃� Tambah Data Inventaris")
     kategori = st.selectbox("Kategori", ["Alat", "Bahan", "Riwayat Penggunaan"])
-
     if kategori == "Alat":
         nama = st.text_input("Nama Alat")
         jumlah = st.number_input("Jumlah", min_value=1)
@@ -59,7 +61,7 @@ elif menu == "Tambah Data":
         if st.button("Simpan"):
             new_row = {"Nama Alat": nama, "Jumlah": jumlah, "Tempat Penyimpanan": lokasi}
             alat_df = pd.concat([alat_df, pd.DataFrame([new_row])], ignore_index=True)
-            save_data(alat_df, ALAT_FILE)
+            alat_df.to_csv(ALAT_FILE, index=False)
             st.success("Alat berhasil ditambahkan!")
 
     elif kategori == "Bahan":
@@ -70,7 +72,7 @@ elif menu == "Tambah Data":
         if st.button("Simpan"):
             new_row = {"Nama Bahan": nama, "Jumlah": jumlah, "Tanggal Expired": expired, "Tempat Penyimpanan": lokasi}
             bahan_df = pd.concat([bahan_df, pd.DataFrame([new_row])], ignore_index=True)
-            save_data(bahan_df, BAHAN_FILE)
+            bahan_df.to_csv(BAHAN_FILE, index=False)
             st.success("Bahan berhasil ditambahkan!")
 
     elif kategori == "Riwayat Penggunaan":
@@ -90,5 +92,5 @@ elif menu == "Tambah Data":
                 "Keperluan": keperluan
             }
             riwayat_df = pd.concat([riwayat_df, pd.DataFrame([new_row])], ignore_index=True)
-            save_data(riwayat_df, RIWAYAT_FILE)
+            riwayat_df.to_csv(RIWAYAT_FILE, index=False)
             st.success("Riwayat penggunaan berhasil ditambahkan!")
