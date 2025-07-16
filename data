@@ -1,3 +1,6 @@
+rm data
+mkdir data
+
 stok_alat.csv
 stok_bahan.csv
 riwayat_penggunaan.csv
