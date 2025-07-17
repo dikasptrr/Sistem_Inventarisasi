@@ -148,10 +148,24 @@ elif menu == "Tambah Data":
             riwayat_df.to_csv(RIWAYAT_FILE, index=False)
             st.success("Riwayat penggunaan berhasil ditambahkan!")
 
-with st.expander("🗑️ Hapus Data Bahan"):
-    bahan_to_delete = st.selectbox("Pilih bahan yang ingin dihapus", bahan_df["Nama Bahan"].unique())
-    if st.button("Hapus Bahan"):
-        bahan_df = bahan_df[bahan_df["Nama Bahan"] != bahan_to_delete]
-        bahan_df.to_csv(BAHAN_FILE, index=False)
-        st.success(f"Bahan '{bahan_to_delete}' berhasil dihapus!")
+    elif kategori == "Bahan":
+        nama = st.text_input("Nama Bahan")
+        jumlah = st.text_input("Jumlah (mis. 500 ml / 1 kg)")
+        expired = st.date_input("Tanggal Kedaluwarsa")
+        lokasi = st.text_input("Tempat Penyimpanan")
+        if st.button("Simpan"):
+            new_row = {"Nama Bahan": nama, "Jumlah": jumlah, "Tanggal Expired": expired, "Tempat Penyimpanan": lokasi}
+            bahan_df = pd.concat([bahan_df, pd.DataFrame([new_row])], ignore_index=True)
+            bahan_df.to_csv(BAHAN_FILE, index=False)
+            st.success("Bahan berhasil ditambahkan!")
 
+        st.markdown("---")
+        st.subheader("🗑️ Hapus Data Bahan")
+        if not bahan_df.empty:
+            bahan_terpilih = st.selectbox("Pilih bahan yang ingin dihapus", bahan_df["Nama Bahan"].unique())
+            if st.button("Hapus Bahan"):
+                bahan_df = bahan_df[bahan_df["Nama Bahan"] != bahan_terpilih]
+                bahan_df.to_csv(BAHAN_FILE, index=False)
+                st.success(f"Bahan '{bahan_terpilih}' berhasil dihapus!")
+        else:
+            st.info("Belum ada data bahan yang bisa dihapus.")
