@@ -147,3 +147,11 @@ elif menu == "Tambah Data":
             riwayat_df = pd.concat([riwayat_df, pd.DataFrame([new_row])], ignore_index=True)
             riwayat_df.to_csv(RIWAYAT_FILE, index=False)
             st.success("Riwayat penggunaan berhasil ditambahkan!")
+
+with st.expander("🗑️ Hapus Data Bahan"):
+    bahan_to_delete = st.selectbox("Pilih bahan yang ingin dihapus", bahan_df["Nama Bahan"].unique())
+    if st.button("Hapus Bahan"):
+        bahan_df = bahan_df[bahan_df["Nama Bahan"] != bahan_to_delete]
+        bahan_df.to_csv(BAHAN_FILE, index=False)
+        st.success(f"Bahan '{bahan_to_delete}' berhasil dihapus!")
+
