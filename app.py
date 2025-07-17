@@ -72,11 +72,11 @@ elif menu == "Stok Bahan":
             return "Tidak Diketahui"
         satuan = str(satuan).lower()
         if satuan == "ml":
-            return "❗ Stok Menipis" if sisa < 50 else "✅ Cukup"
+            return "❗ Stok Menipis" if sisa < 50 else "Cukup"
         elif satuan == "g":
-            return "❗ Stok Menipis" if sisa < 25 else "✅ Cukup"
+            return "❗ Stok Menipis" if sisa < 25 else "Cukup"
         else:
-            return "❗ Stok Menipis" if sisa < 10 else "✅ Cukup"
+            return "❗ Stok Menipis" if sisa < 10 else "Cukup"
 
     merged["Status"] = merged.apply(lambda row: status_stok(row["Sisa"], row["Satuan"]), axis=1)
 
