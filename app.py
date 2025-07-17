@@ -103,3 +103,31 @@ elif menu == "Tambah Data":
             riwayat_df = pd.concat([riwayat_df, pd.DataFrame([new_row])], ignore_index=True)
             riwayat_df.to_csv(RIWAYAT_FILE, index=False)
             st.success("Riwayat penggunaan berhasil ditambahkan!")
+
+elif menu == "Sisa Bahan Kimia":
+    st.header("🔻 Sisa Bahan Kimia Tersedia")
+
+    # Gabungkan data bahan awal dan penggunaan
+    penggunaan_bahan = riwayat_df[riwayat_df["Kategori"] == "Bahan"]
+
+    # Normalisasi jumlah bahan awal (misal "500 ml" → ambil angka saja)
+    bahan_df_copy = bahan_df.copy()
+    bahan_df_copy["Jumlah Awal"] = bahan_df_copy["Jumlah"].str.extract('(\d+\.?\d*)').astype(float)
+
+    # Hitung total penggunaan per bahan
+    penggunaan_agg = (
+        penggunaan_bahan.groupby("Nama")["Jumlah Digunakan"]
+        .apply(lambda x: pd.to_numeric(x, errors='coerce').sum())
+        .reset_index()
+        .rename(columns={"Jumlah Digunakan": "Jumlah Terpakai"})
+    )
+
+    # Gabungkan dengan stok awal
+    hasil = pd.merge(bahan_df_copy, penggunaan_agg, how="left", left_on="Nama Bahan", right_on="Nama")
+    hasil["Jumlah Terpakai"] = hasil["Jumlah Terpakai"].fillna(0)
+    hasil["Sisa"] = hasil["Jumlah Awal"] - hasil["Jumlah Terpakai"]
+    hasil["Satuan"] = bahan_df["Jumlah"].str.extract(r'[a-zA-Z]+')
+
+    # Tampilkan hasil
+    st.dataframe(hasil[["Nama Bahan", "Jumlah", "Jumlah Terpakai", "Sisa", "Satuan", "Tempat Penyimpanan", "Tanggal Expired"]])
+
