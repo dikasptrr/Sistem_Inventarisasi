@@ -1,3 +1,4 @@
 Nama,Kategori,Jumlah Digunakan,Tanggal,Digunakan Oleh,Keperluan
+Sisa = Jumlah Awal - Total Jumlah Digunakan
 Asam Asetat,Bahan,100 ml,2025-07-15,Andika,Uji titrasi
 Tabung Reaksi,Alat,5,2025-07-14,Sri,Larutan indikator
