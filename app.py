@@ -3,13 +3,13 @@ import pandas as pd
 import os
 from datetime import datetime
 
-# Folder tempat menyimpan file CSV
+# --- Path File ---
 DATA_DIR = "data"
 ALAT_FILE = os.path.join(DATA_DIR, "stok_alat.csv")
 BAHAN_FILE = os.path.join(DATA_DIR, "stok_bahan.csv")
 RIWAYAT_FILE = os.path.join(DATA_DIR, "riwayat_penggunaan.csv")
 
-# Fungsi untuk memuat data dan membuat file jika belum ada
+# --- Buat folder dan file jika belum ada ---
 def load_data():
     os.makedirs(DATA_DIR, exist_ok=True)
 
@@ -27,15 +27,14 @@ def load_data():
     riwayat_df = pd.read_csv(RIWAYAT_FILE)
     return alat_df, bahan_df, riwayat_df
 
-
-# Tampilan utama
-st.title("📒 Logbook Inventarisasi Laboratorium Kimia Politeknik AKA Bogor")
-
-menu = st.sidebar.selectbox("Menu", ["Stok Alat", "Stok Bahan", "Riwayat Penggunaan", "Tambah Data"])
-
+# --- Load data awal ---
 alat_df, bahan_df, riwayat_df = load_data()
 
-# Tampilan Stok Alat
+# --- Sidebar Menu ---
+st.title("📒 Logbook Inventarisasi Laboratorium Kimia Politeknik AKA Bogor")
+menu = st.sidebar.selectbox("Menu", ["Stok Alat", "Stok Bahan", "Riwayat Penggunaan", "Tambah Data"])
+
+# --- Tampilan Stok Alat ---
 if menu == "Stok Alat":
     st.header("📌 Stok Alat Laboratorium")
     st.dataframe(alat_df)
@@ -44,86 +43,11 @@ if menu == "Stok Alat":
         filtered = alat_df[alat_df["Nama Alat"].str.contains(search, case=False)]
         st.dataframe(filtered)
 
-# Tampilan Stok Bahan
+# --- Tampilan Stok Bahan (plus Sisa & Stok Menipis) ---
 elif menu == "Stok Bahan":
     st.header("🧪 Stok Bahan Kimia")
 
-    # Salin bahan_df dan konversi jumlah awal
+    # Proses jumlah awal & satuan
     bahan_df_copy = bahan_df.copy()
-    bahan_df_copy["Jumlah Awal"] = bahan_df_copy["Jumlah"].str.extract('(\d+\.?\d*)').astype(float)
-
-    # Filter riwayat penggunaan untuk kategori "Bahan"
-    penggunaan_bahan = riwayat_df[riwayat_df["Kategori"] == "Bahan"]
-
-    # Hitung total penggunaan per bahan
-    penggunaan_agg = (
-        penggunaan_bahan.groupby("Nama")["Jumlah Digunakan"]
-        .apply(lambda x: pd.to_numeric(x, errors='coerce').sum())
-        .reset_index()
-        .rename(columns={"Jumlah Digunakan": "Jumlah Terpakai"})
-    )
-
-    # Gabungkan data bahan dan penggunaan
-    merged = pd.merge(bahan_df_copy, penggunaan_agg, how="left", left_on="Nama Bahan", right_on="Nama")
-    merged["Jumlah Terpakai"] = merged["Jumlah Terpakai"].fillna(0)
-    merged["Sisa"] = merged["Jumlah Awal"] - merged["Jumlah Terpakai"]
-    merged["Satuan"] = bahan_df_copy["Jumlah"].str.extract(r'([a-zA-Z]+)')
-
-    # Tampilkan data gabungan
-    st.dataframe(merged[["Nama Bahan", "Jumlah", "Jumlah Terpakai", "Sisa", "Satuan", "Tanggal Expired", "Tempat Penyimpanan"]])
-
-    with st.expander("🔍 Cari Bahan"):
-        search = st.text_input("Nama bahan:")
-        filtered = merged[merged["Nama Bahan"].str.contains(search, case=False)]
-        st.dataframe(filtered[["Nama Bahan", "Jumlah", "Jumlah Terpakai", "Sisa", "Satuan", "Tanggal Expired", "Tempat Penyimpanan"]])
-
-# Tampilan Riwayat Penggunaan
-elif menu == "Riwayat Penggunaan":
-    st.header("📝 Riwayat Penggunaan Alat dan Bahan")
-    st.dataframe(riwayat_df)
-
-# Form Tambah Data
-elif menu == "Tambah Data":
-    st.header("➕ Tambah Data Inventaris")
-    kategori = st.selectbox("Kategori", ["Alat", "Bahan", "Riwayat Penggunaan"])
-
-    if kategori == "Alat":
-        nama = st.text_input("Nama Alat")
-        jumlah = st.number_input("Jumlah", min_value=1)
-        lokasi = st.text_input("Tempat Penyimpanan")
-        if st.button("Simpan"):
-            new_row = {"Nama Alat": nama, "Jumlah": jumlah, "Tempat Penyimpanan": lokasi}
-            alat_df = pd.concat([alat_df, pd.DataFrame([new_row])], ignore_index=True)
-            alat_df.to_csv(ALAT_FILE, index=False)
-            st.success("Alat berhasil ditambahkan!")
-
-    elif kategori == "Bahan":
-        nama = st.text_input("Nama Bahan")
-        jumlah = st.text_input("Jumlah (mis. 500 ml / 1 kg)")
-        expired = st.date_input("Tanggal Kedaluwarsa")
-        lokasi = st.text_input("Tempat Penyimpanan")
-        if st.button("Simpan"):
-            new_row = {"Nama Bahan": nama, "Jumlah": jumlah, "Tanggal Expired": expired, "Tempat Penyimpanan": lokasi}
-            bahan_df = pd.concat([bahan_df, pd.DataFrame([new_row])], ignore_index=True)
-            bahan_df.to_csv(BAHAN_FILE, index=False)
-            st.success("Bahan berhasil ditambahkan!")
-
-    elif kategori == "Riwayat Penggunaan":
-        nama = st.text_input("Nama Alat/Bahan")
-        kategori_penggunaan = st.selectbox("Kategori", ["Alat", "Bahan"])
-        jumlah = st.text_input("Jumlah Digunakan")
-        tanggal = st.date_input("Tanggal Penggunaan", value=datetime.today())
-        digunakan_oleh = st.text_input("Digunakan Oleh")
-        keperluan = st.text_area("Keperluan")
-        if st.button("Simpan"):
-            new_row = {
-                "Nama": nama,
-                "Kategori": kategori_penggunaan,
-                "Jumlah Digunakan": jumlah,
-                "Tanggal": tanggal,
-                "Digunakan Oleh": digunakan_oleh,
-                "Keperluan": keperluan
-            }
-            riwayat_df = pd.concat([riwayat_df, pd.DataFrame([new_row])], ignore_index=True)
-            riwayat_df.to_csv(RIWAYAT_FILE, index=False)
-            st.success("Riwayat penggunaan berhasil ditambahkan!")
+    bahan_df_copy["Jumlah Awal"] = bahan_df_copy["Jumlah"].str.extract(r'(\d+\.?\d*)').astype(float)
+    bahan_df_copy["Satuan"] = bahan_df_copy["Ju]()
