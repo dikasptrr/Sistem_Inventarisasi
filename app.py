@@ -27,31 +27,9 @@ def load_data():
     riwayat_df = pd.read_csv(RIWAYAT_FILE)
     return alat_df, bahan_df, riwayat_df
 
-# Styling background
-def set_background():
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background-image: url("https://images.unsplash.com/photo-1581090700227-1e8e8f2340e5");
-            background-size: cover;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            color: white;
-        }}
-        .block-container {{
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 2rem;
-            border-radius: 1rem;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
 
-set_background()
 # Tampilan utama
-st.title("📒 Logbook Inventarisasi Laboratorium Kimia")
+st.title("📒 Logbook Inventarisasi Laboratorium Kimia Politeknik AKA Bogor")
 
 menu = st.sidebar.selectbox("Menu", ["Stok Alat", "Stok Bahan", "Riwayat Penggunaan", "Tambah Data"])
 
