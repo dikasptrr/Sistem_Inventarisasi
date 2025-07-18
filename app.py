@@ -105,7 +105,8 @@ elif menu == "Riwayat Penggunaan":
 # --- Tambah Data ---
 elif menu == "Tambah Data":
     st.header("➕ Tambah Data Inventaris")
-    kategori = st.selectbox("Kategori", ["Alat", "Bahan", "Riwayat Penggunaan"])
+    kategori = st.selectbox("Kategori", ["Alat", "Bahan", "Riwayat Penggunaan", "Pengembalian Alat"])
+
 
     if kategori == "Alat":
         nama = st.text_input("Nama Alat")
