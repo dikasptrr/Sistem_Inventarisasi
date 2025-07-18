@@ -3,6 +3,39 @@ import pandas as pd
 import os
 from datetime import datetime
 
+st.markdown(
+    """
+    <style>
+    /* Background gradient */
+    .stApp {
+        background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+        background-attachment: fixed;
+    }
+
+    /* Card-like white container for all widgets */
+    .css-1d391kg, .css-1v0mbdj {
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Make expander titles bold */
+    .streamlit-expanderHeader {
+        font-weight: bold;
+    }
+
+    /* Customize sidebar */
+    .css-1d391kg > .css-hxt7ib {
+        background-color: #f8fafc;
+        border-radius: 10px;
+        padding: 1rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # --- Path File ---
 DATA_DIR = "data"
 ALAT_FILE = os.path.join(DATA_DIR, "stok_alat.csv")
