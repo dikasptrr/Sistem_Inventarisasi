@@ -185,14 +185,25 @@ elif menu == "Transaksi Lab" and role == "Laboran":
             st.success("✅ Pengambilan bahan disimpan")
 
 # ------------------------------
-# 7. LOGBOOK PEMAKAIAN (Mahasiswa)
+# 7. LOGBOOK PEMAKAIAN (MAHASISWA)
 # ------------------------------
 elif menu == "Logbook Pemakaian" and role == "Mahasiswa":
-    st.subheader("📃 Logbook Pemakaian Pribadi")
-    nama_pengguna = st.text_input("Nama Mahasiswa")
+    st.subheader("📝 Logbook Pemakaian Alat/Bahan")
 
-    if nama_pengguna:
-        logbook = riwayat_df[riwayat_df["Pengguna"].str.contains(nama_pengguna, case=False, na=False)]
-        st.dataframe(logbook)
+    kategori = st.selectbox("Kategori", ["Bahan", "Alat"])
+    
+    if kategori == "Bahan":
+        nama = st.selectbox("Nama Bahan", bahan_df["Nama Bahan"].unique())
     else:
-        st.info("Masukkan nama Anda untuk melihat logbook penggunaan.")
+        nama = st.selectbox("Nama Alat", alat_df["Nama Alat"].unique())
+
+    jumlah = st.text_input("Jumlah yang digunakan (misal: 10 ml atau 2 buah)")
+    tanggal = st.date_input("Tanggal Pemakaian", value=datetime.today())
+    pengguna = st.text_input("Nama Mahasiswa")
+    keterangan = st.text_area("Keterangan atau Keperluan")
+
+    if st.button("Kirim Logbook"):
+        new_log = pd.DataFrame([[nama, kategori, jumlah, tanggal, pengguna, keterangan]], columns=riwayat_df.columns)
+        riwayat_df = pd.concat([riwayat_df, new_log], ignore_index=True)
+        riwayat_df.to_csv(RIWAYAT_FILE, index=False)
+        st.success("✅ Logbook pemakaian berhasil dikirim.")
