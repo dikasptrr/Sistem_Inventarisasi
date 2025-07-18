@@ -40,21 +40,20 @@ if menu == "Stok Alat":
 elif menu == "Stok Bahan":
     st.subheader("🧪 Daftar Stok Bahan Kimia")
     df = bahan_df.copy()
-    
-    # Ambil angka dan satuan dari kolom jumlah
+
     df["Jumlah Awal"] = df["Jumlah"].str.extract(r'(\d+\.?\d*)')
     df["Satuan"] = df["Jumlah"].str.extract(r'([a-zA-Z]+)')
     df["Jumlah Awal"] = pd.to_numeric(df["Jumlah Awal"], errors="coerce").fillna(0)
 
-    # Ambil total pemakaian dari riwayat
+    # Ambil data penggunaan
     penggunaan = riwayat_df[riwayat_df["Kategori"] == "Bahan"]
     penggunaan["Jumlah"] = pd.to_numeric(penggunaan["Jumlah"], errors="coerce")
     terpakai = penggunaan.groupby("Nama")["Jumlah"].sum().reset_index(name="Terpakai")
-    
+
     df = df.merge(terpakai, how="left", left_on="Nama Bahan", right_on="Nama")
     df["Terpakai"] = df["Terpakai"].fillna(0)
     df["Sisa"] = df["Jumlah Awal"] - df["Terpakai"]
-    
+
     def status(sisa, satuan):
         satuan = str(satuan).lower()
         if satuan == "ml" and sisa < 50:
@@ -66,15 +65,14 @@ elif menu == "Stok Bahan":
         return "Cukup"
 
     df["Status"] = df.apply(lambda row: status(row["Sisa"], row["Satuan"]), axis=1)
-    if "❗ Menipis" in df["Status"].values:
-        st.warning("⚠️ Beberapa bahan hampir habis!")
 
-    st.dataframe(df[["Nama Bahan", "Jumlah", "Terpakai", "Sisa", "Satuan", "Status", "Expired", "Tempat"]])
+    st.dataframe(df[[
+        "Nama Bahan", "Jumlah", "Terpakai", "Sisa", "Satuan", "Status", "Tanggal Expired", "Tempat Penyimpanan"
+    ]])
 
     search = st.text_input("🔍 Cari bahan:")
     if search:
         st.dataframe(df[df["Nama Bahan"].str.contains(search, case=False)])
-
 
 # ---------- Riwayat ----------
 elif menu == "Riwayat":
@@ -148,15 +146,16 @@ elif menu == "Tambah Data":
 
 # ---------- Stok per Lemari ----------
 elif menu == "Stok per Lemari":
-    st.subheader("📦 Total Stok di Tiap Tempat Penyimpanan")
+    st.subheader("📦 Total Stok per Lemari")
     df = bahan_df.copy()
-    
+
     df["Jumlah Angka"] = df["Jumlah"].str.extract(r'(\d+\.?\d*)')
     df["Jumlah Angka"] = pd.to_numeric(df["Jumlah Angka"], errors="coerce").fillna(0)
-    df["Tempat"] = df["Tempat"].fillna("Tidak Diketahui")
+    df["Tempat Penyimpanan"] = df["Tempat Penyimpanan"].fillna("Tidak Diketahui")
 
-    hasil = df.groupby("Tempat")["Jumlah Angka"].sum().reset_index()
-    hasil.columns = ["Tempat", "Total Jumlah"]
-    
+    hasil = df.groupby("Tempat Penyimpanan")["Jumlah Angka"].sum().reset_index()
+    hasil.columns = ["Tempat Penyimpanan", "Total Jumlah"]
+
     st.dataframe(hasil)
+
 
