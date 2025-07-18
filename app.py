@@ -52,7 +52,7 @@ elif menu == "Stok Bahan":
 
     penggunaan = riwayat_df[riwayat_df["Kategori"] == "Bahan"]
     penggunaan["Jumlah Digunakan"] = pd.to_numeric(penggunaan["Jumlah Digunakan"], errors="coerce")
-    terpakai = penggunaan.groupby("Nama")["Jumlah"].sum().reset_index(name="Terpakai")
+    terpakai = penggunaan.groupby("Nama")["Jumlah Digunakan"].sum().reset_index(name="Terpakai")
 
     df = df.merge(terpakai, how="left", left_on="Nama Bahan", right_on="Nama")
     df["Terpakai"] = df["Terpakai"].fillna(0)
