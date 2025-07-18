@@ -15,7 +15,7 @@ def load_data():
     if not os.path.exists(ALAT_FILE):
         pd.DataFrame(columns=["Nama Alat", "Jumlah", "Tempat"]).to_csv(ALAT_FILE, index=False)
     if not os.path.exists(BAHAN_FILE):
-        pd.DataFrame(columns=["Nama Bahan", "Jumlah", "Expired", "Tempat"]).to_csv(BAHAN_FILE, index=False)
+        pd.DataFrame(columns=["Nama Bahan", "Jumlah", "Tanggal Expired", "Tempat Penyimpanan"]).to_csv(BAHAN_FILE, index=False)
     if not os.path.exists(RIWAYAT_FILE):
         pd.DataFrame(columns=["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "Keperluan"]).to_csv(RIWAYAT_FILE, index=False)
 
@@ -23,7 +23,7 @@ def load_data():
 
 alat_df, bahan_df, riwayat_df = load_data()
 
-# ---------- Judul ----------
+# ---------- Konfigurasi Halaman ----------
 st.set_page_config(page_title="Inventarisasi Lab Kimia", layout="wide")
 st.markdown("<h1 style='text-align:center; color:navy;'>📘 Inventarisasi Lab Kimia - Politeknik AKA Bogor</h1>", unsafe_allow_html=True)
 menu = st.sidebar.radio("Menu", ["Stok Alat", "Stok Bahan", "Riwayat", "Tambah Data", "Stok per Lemari"])
@@ -39,34 +39,26 @@ if menu == "Stok Alat":
 # ---------- Tampilan Stok Bahan ----------
 elif menu == "Stok Bahan":
     st.subheader("🧪 Daftar Stok Bahan Kimia")
-    
     df = bahan_df.copy()
 
-    # Pastikan kolom-kolom yang diperlukan ada
     required_columns = ["Nama Bahan", "Jumlah", "Tanggal Expired", "Tempat Penyimpanan"]
     for col in required_columns:
         if col not in df.columns:
             st.error(f"❌ Kolom '{col}' tidak ditemukan di stok_bahan.csv")
             st.stop()
 
-    # Ekstrak angka dan satuan
     df["Jumlah Awal"] = df["Jumlah"].str.extract(r"(\d+\.?\d*)").astype(float)
     df["Satuan"] = df["Jumlah"].str.extract(r"([a-zA-Z]+)")
 
-    # Hitung pemakaian dari riwayat
     penggunaan = riwayat_df[riwayat_df["Kategori"] == "Bahan"]
     penggunaan["Jumlah"] = pd.to_numeric(penggunaan["Jumlah"], errors="coerce")
     terpakai = penggunaan.groupby("Nama")["Jumlah"].sum().reset_index(name="Terpakai")
 
-    # Merge berdasarkan Nama Bahan → Nama
     df = df.merge(terpakai, how="left", left_on="Nama Bahan", right_on="Nama")
     df["Terpakai"] = df["Terpakai"].fillna(0)
     df.drop(columns=["Nama"], inplace=True, errors="ignore")
-
-    # Hitung sisa
     df["Sisa"] = df["Jumlah Awal"] - df["Terpakai"]
 
-    # Status
     def status(sisa, satuan):
         satuan = str(satuan).lower()
         if satuan == "ml" and sisa < 50:
@@ -79,16 +71,12 @@ elif menu == "Stok Bahan":
 
     df["Status"] = df.apply(lambda row: status(row["Sisa"], row["Satuan"]), axis=1)
 
-    # Tampilkan tabel
-    st.dataframe(df[[
-        "Nama Bahan", "Jumlah", "Terpakai", "Sisa", "Satuan", "Status", "Tanggal Expired", "Tempat Penyimpanan"
-    ]])
+    st.dataframe(df[["Nama Bahan", "Jumlah", "Terpakai", "Sisa", "Satuan", "Status", "Tanggal Expired", "Tempat Penyimpanan"]])
 
     search = st.text_input("🔍 Cari bahan:")
     if search:
         hasil = df[df["Nama Bahan"].str.contains(search, case=False)]
         st.dataframe(hasil)
-
 
 # ---------- Riwayat ----------
 elif menu == "Riwayat":
@@ -164,14 +152,10 @@ elif menu == "Tambah Data":
 elif menu == "Stok per Lemari":
     st.subheader("📦 Total Stok per Lemari")
     df = bahan_df.copy()
-
     df["Jumlah Angka"] = df["Jumlah"].str.extract(r'(\d+\.?\d*)')
     df["Jumlah Angka"] = pd.to_numeric(df["Jumlah Angka"], errors="coerce").fillna(0)
     df["Tempat Penyimpanan"] = df["Tempat Penyimpanan"].fillna("Tidak Diketahui")
 
     hasil = df.groupby("Tempat Penyimpanan")["Jumlah Angka"].sum().reset_index()
     hasil.columns = ["Tempat Penyimpanan", "Total Jumlah"]
-
     st.dataframe(hasil)
-
-
