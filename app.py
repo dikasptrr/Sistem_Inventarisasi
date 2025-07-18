@@ -161,4 +161,34 @@ elif menu == "Tambah Data":
             riwayat_df.to_csv(RIWAYAT_FILE, index=False)
             st.success("Riwayat penggunaan berhasil ditambahkan!")
 
+elif kategori == "Pengembalian Alat":
+    st.subheader("🔄 Pengembalian Alat")
+    if alat_df.empty:
+        st.warning("Data alat kosong. Tambahkan data alat terlebih dahulu.")
+    else:
+        alat_terpilih = st.selectbox("Pilih Alat yang Dikembalikan", alat_df["Nama Alat"].unique())
+        jumlah_dikembalikan = st.number_input("Jumlah Dikembalikan", min_value=1)
+        tanggal_kembali = st.date_input("Tanggal Pengembalian", value=datetime.today())
+        dikembalikan_oleh = st.text_input("Dikembalikan Oleh")
+        catatan = st.text_area("Catatan (Opsional)", "")
+
+        if st.button("Simpan Pengembalian"):
+            # Update stok alat
+            alat_df.loc[alat_df["Nama Alat"] == alat_terpilih, "Jumlah"] += jumlah_dikembalikan
+            alat_df.to_csv(ALAT_FILE, index=False)
+
+            # Tambahkan ke riwayat sebagai informasi
+            new_row = {
+                "Nama": alat_terpilih,
+                "Kategori": "Pengembalian Alat",
+                "Jumlah Digunakan": -jumlah_dikembalikan,  # Negatif sebagai tanda pengembalian
+                "Tanggal": tanggal_kembali,
+                "Digunakan Oleh": dikembalikan_oleh,
+                "Keperluan": f"Pengembalian alat. {catatan}"
+            }
+            riwayat_df = pd.concat([riwayat_df, pd.DataFrame([new_row])], ignore_index=True)
+            riwayat_df.to_csv(RIWAYAT_FILE, index=False)
+
+            st.success("Pengembalian alat berhasil disimpan!")
+
     
