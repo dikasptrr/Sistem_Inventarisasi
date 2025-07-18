@@ -42,7 +42,7 @@ elif role == "Dosen":
     ]
 else:  # Mahasiswa
     menu_options = [
-        "Stok Bahan Kimia", "Stok Alat Laboratorium", "Riwayat Penggunaan"
+        "Stok Bahan Kimia", "Stok Alat Laboratorium", "Riwayat Penggunaan", "Logbook Pemakaian"
     ]
 
 menu = st.sidebar.selectbox("Pilih Menu", menu_options)
@@ -86,7 +86,7 @@ elif menu == "Tambah Data" and role == "Laboran":
         tempat = st.text_input("Tempat Penyimpanan")
         expired = st.date_input("Tanggal Expired")
         if st.button("Simpan Bahan"):
-            new = pd.DataFrame([[nama, jumlah, satuan, tempat, expired]], columns=bahan_df.columns)
+            new = pd.DataFrame([[nama, jumlah, satuan, tempat penyimpanan, expired]], columns=bahan_df.columns)
             bahan_df = pd.concat([bahan_df, new], ignore_index=True)
             bahan_df.to_csv(BAHAN_FILE, index=False)
             st.success("✅ Data bahan disimpan")
@@ -96,7 +96,7 @@ elif menu == "Tambah Data" and role == "Laboran":
         jumlah = st.number_input("Jumlah", min_value=0)
         lokasi = st.text_input("Lokasi Penyimpanan")
         if st.button("Simpan Alat"):
-            new = pd.DataFrame([[nama, jumlah, lokasi]], columns=alat_df.columns)
+            new = pd.DataFrame([[nama, jumlah, Tempat Penyimpanan]], columns=alat_df.columns)
             alat_df = pd.concat([alat_df, new], ignore_index=True)
             alat_df.to_csv(ALAT_FILE, index=False)
             st.success("✅ Data alat disimpan")
