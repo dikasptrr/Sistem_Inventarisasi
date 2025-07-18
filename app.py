@@ -18,22 +18,38 @@ def load_data(file, columns):
     except FileNotFoundError:
         return pd.DataFrame(columns=columns)
 
+# Load datasets
 bahan_df = load_data(BAHAN_FILE, ["Nama Bahan", "Jumlah", "Satuan", "Tempat Penyimpanan", "Tanggal Expired"])
 alat_df = load_data(ALAT_FILE, ["Nama Alat", "Jumlah", "Lokasi"])
 riwayat_df = load_data(RIWAYAT_FILE, ["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "Keterangan"])
 
+# Setup page
 st.set_page_config(page_title="Inventarisasi Lab Kimia", layout="wide")
-st.title("🧪 Inventarisasi Laboratorium Kimia")
+st.title("🔬 Inventarisasi Laboratorium Kimia")
 
-menu = st.sidebar.selectbox("Pilih Menu", [
-    "Stok Bahan Kimia",
-    "Stok Alat Laboratorium",
-    "Tambah Data",
-    "Riwayat Penggunaan",
-    "Stok per Lemari",
-    "Transaksi Lab (Khusus Laboran)"
-])
+# Pilih peran pengguna
+role = st.sidebar.selectbox("Masuk sebagai", ["Mahasiswa", "Dosen", "Laboran"])
 
+# Daftar menu berdasarkan role
+if role == "Laboran":
+    menu_options = [
+        "Stok Bahan Kimia", "Stok Alat Laboratorium", "Tambah Data",
+        "Riwayat Penggunaan", "Stok per Lemari", "Transaksi Lab"
+    ]
+elif role == "Dosen":
+    menu_options = [
+        "Stok Bahan Kimia", "Stok Alat Laboratorium", "Riwayat Penggunaan", "Stok per Lemari"
+    ]
+else:  # Mahasiswa
+    menu_options = [
+        "Stok Bahan Kimia", "Stok Alat Laboratorium", "Riwayat Penggunaan"
+    ]
+
+menu = st.sidebar.selectbox("Pilih Menu", menu_options)
+
+# ------------------------------
+# 1. STOK BAHAN KIMIA
+# ------------------------------
 if menu == "Stok Bahan Kimia":
     st.subheader("📦 Stok Bahan Kimia")
     bahan_display = bahan_df.copy()
@@ -49,11 +65,17 @@ if menu == "Stok Bahan Kimia":
 
     st.dataframe(bahan_display)
 
+# ------------------------------
+# 2. STOK ALAT
+# ------------------------------
 elif menu == "Stok Alat Laboratorium":
     st.subheader("🔧 Stok Alat Laboratorium")
     st.dataframe(alat_df)
 
-elif menu == "Tambah Data":
+# ------------------------------
+# 3. TAMBAH DATA (KHUSUS LABORAN)
+# ------------------------------
+elif menu == "Tambah Data" and role == "Laboran":
     st.subheader("➕ Tambah Data")
     tab1, tab2, tab3 = st.tabs(["Bahan Kimia", "Alat Laboratorium", "Riwayat Penggunaan"])
 
@@ -92,10 +114,16 @@ elif menu == "Tambah Data":
             riwayat_df.to_csv(RIWAYAT_FILE, index=False)
             st.success("✅ Riwayat penggunaan disimpan")
 
+# ------------------------------
+# 4. RIWAYAT
+# ------------------------------
 elif menu == "Riwayat Penggunaan":
     st.subheader("📄 Riwayat Penggunaan Alat & Bahan")
     st.dataframe(riwayat_df)
 
+# ------------------------------
+# 5. STOK PER LEMARI
+# ------------------------------
 elif menu == "Stok per Lemari":
     st.subheader("📁 Stok Bahan per Lemari")
     if "Tempat Penyimpanan" in bahan_df.columns:
@@ -105,8 +133,11 @@ elif menu == "Stok per Lemari":
     else:
         st.warning("Kolom 'Tempat Penyimpanan' tidak ditemukan.")
 
-elif menu == "Transaksi Lab (Khusus Laboran)":
-    st.subheader("🛠️ Transaksi Peminjaman/Pengembalian Alat & Pengambilan Bahan")
+# ------------------------------
+# 6. TRANSAKSI KHUSUS LABORAN
+# ------------------------------
+elif menu == "Transaksi Lab" and role == "Laboran":
+    st.subheader("🛠️ Transaksi Alat & Bahan (Laboran)")
 
     jenis_transaksi = st.selectbox("Jenis Transaksi", ["Peminjaman Alat", "Pengembalian Alat", "Pengambilan Bahan Kimia"])
 
@@ -122,39 +153,33 @@ elif menu == "Transaksi Lab (Khusus Laboran)":
             if st.button("Simpan Peminjaman"):
                 alat_df.loc[alat_df["Nama Alat"] == nama, "Jumlah"] -= jumlah
                 alat_df.to_csv(ALAT_FILE, index=False)
-                new = pd.DataFrame([[nama, "Alat", jumlah, tanggal, pengguna, f"Peminjaman. {keperluan}" ]], columns=riwayat_df.columns)
+                new = pd.DataFrame([[nama, "Alat", jumlah, tanggal, pengguna, f"Peminjaman. {keperluan}"]], columns=riwayat_df.columns)
                 riwayat_df = pd.concat([riwayat_df, new], ignore_index=True)
                 riwayat_df.to_csv(RIWAYAT_FILE, index=False)
                 st.success("✅ Peminjaman disimpan")
 
     elif jenis_transaksi == "Pengembalian Alat":
-        if alat_df.empty:
-            st.warning("Stok alat kosong.")
-        else:
-            nama = st.selectbox("Alat Dikembalikan", alat_df["Nama Alat"].unique())
-            jumlah = st.number_input("Jumlah Dikembalikan", min_value=1)
-            tanggal = st.date_input("Tanggal", value=datetime.today())
-            pengguna = st.text_input("Dikembalikan Oleh")
-            catatan = st.text_area("Catatan")
-            if st.button("Simpan Pengembalian"):
-                alat_df.loc[alat_df["Nama Alat"] == nama, "Jumlah"] += jumlah
-                alat_df.to_csv(ALAT_FILE, index=False)
-                new = pd.DataFrame([[nama, "Pengembalian Alat", -jumlah, tanggal, pengguna, f"Pengembalian. {catatan}" ]], columns=riwayat_df.columns)
-                riwayat_df = pd.concat([riwayat_df, new], ignore_index=True)
-                riwayat_df.to_csv(RIWAYAT_FILE, index=False)
-                st.success("✅ Pengembalian disimpan")
+        nama = st.selectbox("Alat Dikembalikan", alat_df["Nama Alat"].unique())
+        jumlah = st.number_input("Jumlah Dikembalikan", min_value=1)
+        tanggal = st.date_input("Tanggal", value=datetime.today())
+        pengguna = st.text_input("Dikembalikan Oleh")
+        catatan = st.text_area("Catatan")
+        if st.button("Simpan Pengembalian"):
+            alat_df.loc[alat_df["Nama Alat"] == nama, "Jumlah"] += jumlah
+            alat_df.to_csv(ALAT_FILE, index=False)
+            new = pd.DataFrame([[nama, "Pengembalian Alat", -jumlah, tanggal, pengguna, f"Pengembalian. {catatan}"]], columns=riwayat_df.columns)
+            riwayat_df = pd.concat([riwayat_df, new], ignore_index=True)
+            riwayat_df.to_csv(RIWAYAT_FILE, index=False)
+            st.success("✅ Pengembalian disimpan")
 
     elif jenis_transaksi == "Pengambilan Bahan Kimia":
-        if bahan_df.empty:
-            st.warning("Stok bahan kosong.")
-        else:
-            nama = st.selectbox("Bahan Diambil", bahan_df["Nama Bahan"].unique())
-            jumlah = st.text_input("Jumlah Diambil (misal 50 ml)")
-            tanggal = st.date_input("Tanggal", value=datetime.today())
-            pengguna = st.text_input("Diambil Oleh")
-            keperluan = st.text_area("Keperluan")
-            if st.button("Simpan Pengambilan"):
-                new = pd.DataFrame([[nama, "Bahan", jumlah, tanggal, pengguna, f"Pengambilan. {keperluan}" ]], columns=riwayat_df.columns)
-                riwayat_df = pd.concat([riwayat_df, new], ignore_index=True)
-                riwayat_df.to_csv(RIWAYAT_FILE, index=False)
-                st.success("✅ Pengambilan bahan disimpan")
+        nama = st.selectbox("Bahan Diambil", bahan_df["Nama Bahan"].unique())
+        jumlah = st.text_input("Jumlah Diambil (misal 50 ml)")
+        tanggal = st.date_input("Tanggal", value=datetime.today())
+        pengguna = st.text_input("Diambil Oleh")
+        keperluan = st.text_area("Keperluan")
+        if st.button("Simpan Pengambilan"):
+            new = pd.DataFrame([[nama, "Bahan", jumlah, tanggal, pengguna, f"Pengambilan. {keperluan}"]], columns=riwayat_df.columns)
+            riwayat_df = pd.concat([riwayat_df, new], ignore_index=True)
+            riwayat_df.to_csv(RIWAYAT_FILE, index=False)
+            st.success("✅ Pengambilan bahan disimpan")
