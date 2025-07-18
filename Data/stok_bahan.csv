@@ -1,4 +1,6 @@
 Nama Bahan,Jumlah,Tanggal Expired,Tempat Penyimpanan
-Asam Sulfat,500 ml,2025-12-31,Lemari A
-Etanol,250 ml,2025-10-15,Lemari B
-Natrium Klorida,100 g,2026-01-01,Lemari A
+Asam Sulfat,500 ml,2025-12-01,Lemari A
+Natrium Klorida,200 g,2026-05-20,Lemari B
+Etanol,1000 ml,2025-09-15,Lemari A
+Hidrogen Peroksida,250 ml,2024-11-30,Lemari C
+Kalium Permanganat,100 g,2025-10-10,Lemari B
