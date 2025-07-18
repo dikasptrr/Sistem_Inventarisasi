@@ -184,26 +184,46 @@ elif menu == "Transaksi Lab" and role == "Laboran":
             riwayat_df.to_csv(RIWAYAT_FILE, index=False)
             st.success("✅ Pengambilan bahan disimpan")
 
-# ------------------------------
-# 7. LOGBOOK PEMAKAIAN (MAHASISWA)
-# ------------------------------
-elif menu == "Logbook Pemakaian" and role == "Mahasiswa":
-    st.subheader("📝 Logbook Pemakaian Alat/Bahan")
+# File path
+RIWAYAT_FILE = "data/riwayat_penggunaan.csv"
 
+# Buat file jika belum ada
+if not os.path.exists(RIWAYAT_FILE):
+    pd.DataFrame(columns=["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "Keterangan"]).to_csv(RIWAYAT_FILE, index=False)
+
+# Load riwayat
+riwayat_df = pd.read_csv(RIWAYAT_FILE)
+
+# UI untuk logbook pemakaian oleh mahasiswa
+st.header("Logbook Pemakaian")
+
+with st.form("form_logbook"):
+    nama = st.text_input("Nama Bahan / Alat")
     kategori = st.selectbox("Kategori", ["Bahan", "Alat"])
-    
-    if kategori == "Bahan":
-        nama = st.selectbox("Nama Bahan", bahan_df["Nama Bahan"].unique())
-    else:
-        nama = st.selectbox("Nama Alat", alat_df["Nama Alat"].unique())
-
-    jumlah = st.text_input("Jumlah yang digunakan (misal: 10 ml atau 2 buah)")
-    tanggal = st.date_input("Tanggal Pemakaian", value=datetime.today())
+    jumlah = st.number_input("Jumlah Digunakan", min_value=1, step=1)
+    tanggal = st.date_input("Tanggal Penggunaan", value=datetime.today())
     pengguna = st.text_input("Nama Mahasiswa")
-    keterangan = st.text_area("Keterangan atau Keperluan")
+    keterangan = st.text_area("Keterangan Penggunaan")
 
-    if st.button("Kirim Logbook"):
-        new_log = pd.DataFrame([[nama, kategori, jumlah, tanggal, pengguna, keterangan]], columns=riwayat_df.columns)
+    submitted = st.form_submit_button("Kirim Logbook")
+
+    if submitted:
+        # Buat baris data baru
+        new_log = pd.DataFrame([{
+            "Nama": nama,
+            "Kategori": kategori,
+            "Jumlah": jumlah,
+            "Tanggal": tanggal,
+            "Pengguna": pengguna,
+            "Keterangan": keterangan
+        }])
+
+        # Tambahkan ke dataframe dan simpan
         riwayat_df = pd.concat([riwayat_df, new_log], ignore_index=True)
         riwayat_df.to_csv(RIWAYAT_FILE, index=False)
-        st.success("✅ Logbook pemakaian berhasil dikirim.")
+        st.success("✅ Logbook pemakaian berhasil disimpan.")
+
+# Tampilkan riwayat
+st.subheader("Riwayat Logbook Mahasiswa")
+st.dataframe(riwayat_df)
+
