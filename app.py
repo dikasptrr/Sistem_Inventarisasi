@@ -36,6 +36,43 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# Tambahkan CSS background
+st.markdown(
+    """
+    <style>
+    /* Background lembut */
+    .stApp {
+        background-color: #f9f9f9;
+        background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+        background-repeat: repeat;
+        background-attachment: fixed;
+    }
+
+    /* Padding agar konten tidak terlalu mepet */
+    .main .block-container {
+        padding: 2rem;
+    }
+
+    /* Judul dan header lebih elegan */
+    h1, h2, h3 {
+        color: #1e3a5f;
+    }
+
+    /* Sidebar agar tampak rapi */
+    section[data-testid="stSidebar"] {
+        background-color: #e3eaf2;
+    }
+
+    /* Perbaiki font agar lebih profesional */
+    html, body, [class*="css"]  {
+        font-family: 'Segoe UI', sans-serif;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 # --- Path File ---
 DATA_DIR = "data"
 ALAT_FILE = os.path.join(DATA_DIR, "stok_alat.csv")
