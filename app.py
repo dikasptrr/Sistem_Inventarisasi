@@ -3,108 +3,31 @@ import pandas as pd
 import os
 from datetime import datetime
 
-st.markdown(
-    """
-    <style>
-    /* Background gradient */
-    .stApp {
-        background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
-        background-attachment: fixed;
-    }
-
-    /* Card-like white container for all widgets */
-    .css-1d391kg, .css-1v0mbdj {
-        background-color: rgba(255, 255, 255, 0.9);
-        padding: 1.5rem;
-        border-radius: 15px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Make expander titles bold */
-    .streamlit-expanderHeader {
-        font-weight: bold;
-    }
-
-    /* Customize sidebar */
-    .css-1d391kg > .css-hxt7ib {
-        background-color: #f8fafc;
-        border-radius: 10px;
-        padding: 1rem;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-# Tambahkan CSS background
-st.markdown(
-    """
-    <style>
-    /* Background lembut */
-    .stApp {
-        background-color: #f9f9f9;
-        background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
-        background-repeat: repeat;
-        background-attachment: fixed;
-    }
-
-    /* Padding agar konten tidak terlalu mepet */
-    .main .block-container {
-        padding: 2rem;
-    }
-
-    /* Judul dan header lebih elegan */
-    h1, h2, h3 {
-        color: #1e3a5f;
-    }
-
-    /* Sidebar agar tampak rapi */
-    section[data-testid="stSidebar"] {
-        background-color: #e3eaf2;
-    }
-
-    /* Perbaiki font agar lebih profesional */
-    html, body, [class*="css"]  {
-        font-family: 'Segoe UI', sans-serif;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-
 # --- Path File ---
 DATA_DIR = "data"
 ALAT_FILE = os.path.join(DATA_DIR, "stok_alat.csv")
 BAHAN_FILE = os.path.join(DATA_DIR, "stok_bahan.csv")
 RIWAYAT_FILE = os.path.join(DATA_DIR, "riwayat_penggunaan.csv")
 
-# --- Buat folder dan file jika belum ada ---
+# --- Load atau buat file ---
 def load_data():
     os.makedirs(DATA_DIR, exist_ok=True)
-
     if not os.path.exists(ALAT_FILE):
         pd.DataFrame(columns=["Nama Alat", "Jumlah", "Tempat Penyimpanan"]).to_csv(ALAT_FILE, index=False)
-
     if not os.path.exists(BAHAN_FILE):
         pd.DataFrame(columns=["Nama Bahan", "Jumlah", "Tanggal Expired", "Tempat Penyimpanan"]).to_csv(BAHAN_FILE, index=False)
-
     if not os.path.exists(RIWAYAT_FILE):
-        pd.DataFrame(columns=["Nama", "Kategori", "Jumlah Digunakan", "Tanggal", "Digunakan Oleh", "Keperluan"]).to_csv(RIWAYAT_FILE, index=False)
-
-    alat_df = pd.read_csv(ALAT_FILE)
-    bahan_df = pd.read_csv(BAHAN_FILE)
-    riwayat_df = pd.read_csv(RIWAYAT_FILE)
-    return alat_df, bahan_df, riwayat_df
+        pd.DataFrame(columns=["Nama", "Kategori", "Jumlah Digunakan", "Tanggal", "Digunakan Oleh", "Keperluan", "Status"]).to_csv(RIWAYAT_FILE, index=False)
+    return pd.read_csv(ALAT_FILE), pd.read_csv(BAHAN_FILE), pd.read_csv(RIWAYAT_FILE)
 
 # --- Load data awal ---
 alat_df, bahan_df, riwayat_df = load_data()
 
-# --- Sidebar Menu ---
+# --- Sidebar ---
 st.title("📒 Inventarisasi Laboratorium Kimia Politeknik AKA Bogor")
 menu = st.sidebar.selectbox("Menu", ["Stok Alat", "Stok Bahan", "Riwayat Penggunaan", "Tambah Data"])
 
-# --- Tampilan Stok Alat ---
+# --- Stok Alat ---
 if menu == "Stok Alat":
     st.header("📌 Stok Alat Laboratorium")
     st.dataframe(alat_df)
@@ -113,174 +36,93 @@ if menu == "Stok Alat":
         filtered = alat_df[alat_df["Nama Alat"].str.contains(search, case=False)]
         st.dataframe(filtered)
 
-# --- Tampilan Stok Bahan (plus Sisa & Stok Menipis) ---
+# --- Stok Bahan ---
 elif menu == "Stok Bahan":
     st.header("🧪 Stok Bahan Kimia")
-
-    # Proses jumlah awal & satuan
     bahan_df_copy = bahan_df.copy()
     bahan_df_copy["Jumlah Awal"] = bahan_df_copy["Jumlah"].str.extract(r'(\d+\.?\d*)').astype(float)
     bahan_df_copy["Satuan"] = bahan_df_copy["Jumlah"].str.extract(r'([a-zA-Z]+)')
 
-    # Hitung total penggunaan bahan
-    penggunaan_bahan = riwayat_df[riwayat_df["Kategori"] == "Bahan"]
-    penggunaan_agg = (
-        penggunaan_bahan.groupby("Nama")["Jumlah Digunakan"]
-        .apply(lambda x: pd.to_numeric(x, errors='coerce').sum())
-        .reset_index()
-        .rename(columns={"Jumlah Digunakan": "Jumlah Terpakai"})
-    )
+    penggunaan = riwayat_df[riwayat_df["Kategori"] == "Bahan"]
+    penggunaan = penggunaan.groupby("Nama")["Jumlah Digunakan"].apply(lambda x: pd.to_numeric(x, errors='coerce').sum()).reset_index(name="Jumlah Terpakai")
 
-    # Gabungkan dan hitung sisa
-    merged = pd.merge(bahan_df_copy, penggunaan_agg, how="left", left_on="Nama Bahan", right_on="Nama")
-    merged["Jumlah Terpakai"] = merged["Jumlah Terpakai"].fillna(0)
+    merged = pd.merge(bahan_df_copy, penggunaan, how="left", left_on="Nama Bahan", right_on="Nama")
+    merged["Jumlah Terpakai"].fillna(0, inplace=True)
     merged["Sisa"] = merged["Jumlah Awal"] - merged["Jumlah Terpakai"]
 
-    # --- Logika ambang batas berdasarkan satuan ---
     def status_stok(sisa, satuan):
-        if pd.isna(sisa):
-            return "Tidak Diketahui"
         satuan = str(satuan).lower()
-        if satuan == "ml":
-            return "❗ Stok Menipis" if sisa < 50 else "Cukup"
-        elif satuan == "g":
-            return "❗ Stok Menipis" if sisa < 25 else "Cukup"
-        else:
-            return "❗ Stok Menipis" if sisa < 10 else "Cukup"
+        if pd.isna(sisa): return "Tidak Diketahui"
+        if satuan == "ml": return "❗ Menipis" if sisa < 50 else "Cukup"
+        if satuan == "g": return "❗ Menipis" if sisa < 25 else "Cukup"
+        return "❗ Menipis" if sisa < 10 else "Cukup"
 
     merged["Status"] = merged.apply(lambda row: status_stok(row["Sisa"], row["Satuan"]), axis=1)
 
-    # Tampilkan peringatan umum
-    if "❗ Stok Menipis" in merged["Status"].values:
-        st.warning("⚠️ Beberapa bahan memiliki stok menipis!")
-
-    # Tampilkan hasil
-    st.dataframe(
-        merged[["Nama Bahan", "Jumlah", "Jumlah Terpakai", "Sisa", "Satuan", "Status", "Tanggal Expired", "Tempat Penyimpanan"]]
-    )
-
-    # Fitur pencarian
+    st.dataframe(merged[["Nama Bahan", "Jumlah", "Jumlah Terpakai", "Sisa", "Satuan", "Status", "Tanggal Expired", "Tempat Penyimpanan"]])
+    
     with st.expander("🔍 Cari Bahan"):
         search = st.text_input("Nama bahan:")
         filtered = merged[merged["Nama Bahan"].str.contains(search, case=False)]
-        st.dataframe(
-            filtered[["Nama Bahan", "Jumlah", "Jumlah Terpakai", "Sisa", "Satuan", "Status", "Tanggal Expired", "Tempat Penyimpanan"]]
-        )
+        st.dataframe(filtered)
 
 # --- Riwayat Penggunaan ---
 elif menu == "Riwayat Penggunaan":
-    st.header("📝 Riwayat Penggunaan Alat dan Bahan")
+    st.header("📝 Riwayat Penggunaan")
     st.dataframe(riwayat_df)
 
 # --- Tambah Data ---
 elif menu == "Tambah Data":
-    st.header("➕ Tambah Data Inventaris")
-    kategori = st.selectbox("Kategori", ["Alat", "Bahan", "Riwayat Penggunaan", "Pengembalian Alat"])
-
+    st.header("➕ Tambah Data")
+    kategori = st.selectbox("Kategori", ["Alat", "Bahan", "Riwayat Penggunaan"])
 
     if kategori == "Alat":
         nama = st.text_input("Nama Alat")
         jumlah = st.number_input("Jumlah", min_value=1)
         lokasi = st.text_input("Tempat Penyimpanan")
-        if st.button("Simpan"):
+        if st.button("Simpan Alat"):
             new_row = {"Nama Alat": nama, "Jumlah": jumlah, "Tempat Penyimpanan": lokasi}
             alat_df = pd.concat([alat_df, pd.DataFrame([new_row])], ignore_index=True)
             alat_df.to_csv(ALAT_FILE, index=False)
-            st.success("Alat berhasil ditambahkan!")
+            st.success("✅ Alat ditambahkan")
 
     elif kategori == "Bahan":
-        st.subheader("🧾 Tambah Bahan")
         nama = st.text_input("Nama Bahan")
-        jumlah = st.text_input("Jumlah (mis. 500 mL / 1 kg)")
-        expired = st.date_input("Tanggal Kedaluwarsa")
+        jumlah = st.text_input("Jumlah (mis. 500 ml / 1 kg)")
+        expired = st.date_input("Tanggal Expired")
         lokasi = st.text_input("Tempat Penyimpanan")
-        if st.button("Simpan"):
+        if st.button("Simpan Bahan"):
             new_row = {"Nama Bahan": nama, "Jumlah": jumlah, "Tanggal Expired": expired, "Tempat Penyimpanan": lokasi}
             bahan_df = pd.concat([bahan_df, pd.DataFrame([new_row])], ignore_index=True)
             bahan_df.to_csv(BAHAN_FILE, index=False)
-            st.success("Bahan berhasil ditambahkan!")
+            st.success("✅ Bahan ditambahkan")
 
-        st.markdown("---")
-        st.subheader("🗑️ Hapus Data Bahan")
+        st.subheader("🗑️ Hapus Bahan")
         if not bahan_df.empty:
-            bahan_terpilih = st.selectbox("Pilih bahan yang ingin dihapus", bahan_df["Nama Bahan"].unique())
+            bahan_terpilih = st.selectbox("Pilih bahan", bahan_df["Nama Bahan"].unique())
             if st.button("Hapus Bahan"):
                 bahan_df = bahan_df[bahan_df["Nama Bahan"] != bahan_terpilih]
                 bahan_df.to_csv(BAHAN_FILE, index=False)
-                st.success(f"Bahan '{bahan_terpilih}' berhasil dihapus!")
-        else:
-            st.info("Belum ada data bahan yang bisa dihapus.")
-
+                st.success(f"✅ '{bahan_terpilih}' dihapus")
 
     elif kategori == "Riwayat Penggunaan":
-        nama = st.text_input("Nama Alat/Bahan")
+        nama = st.text_input("Nama Barang")
         kategori_penggunaan = st.selectbox("Kategori", ["Alat", "Bahan"])
-        jumlah = st.text_input("Jumlah Digunakan (angka saja)")
-        tanggal = st.date_input("Tanggal Penggunaan", value=datetime.today())
-        digunakan_oleh = st.text_input("Digunakan Oleh")
+        jumlah = st.text_input("Jumlah Digunakan")
+        tanggal = st.date_input("Tanggal", value=datetime.today())
+        oleh = st.text_input("Digunakan Oleh")
         keperluan = st.text_area("Keperluan")
-        if st.button("Simpan"):
+        status = st.selectbox("Status", ["Digunakan", "Dikembalikan"] if kategori_penggunaan == "Alat" else ["Digunakan"])
+        if st.button("Simpan Riwayat"):
             new_row = {
                 "Nama": nama,
                 "Kategori": kategori_penggunaan,
                 "Jumlah Digunakan": jumlah,
                 "Tanggal": tanggal,
-                "Digunakan Oleh": digunakan_oleh,
-                "Keperluan": keperluan
+                "Digunakan Oleh": oleh,
+                "Keperluan": keperluan,
+                "Status": status
             }
             riwayat_df = pd.concat([riwayat_df, pd.DataFrame([new_row])], ignore_index=True)
             riwayat_df.to_csv(RIWAYAT_FILE, index=False)
-            st.success("Riwayat penggunaan berhasil ditambahkan!")
-
-    elif kategori == "Riwayat Penggunaan":
-        nama = st.text_input("Nama Alat/Bahan")
-        kategori_penggunaan = st.selectbox("Kategori", ["Alat", "Bahan"])
-        jumlah = st.text_input("Jumlah Digunakan (angka saja)")
-        tanggal = st.date_input("Tanggal Penggunaan", value=datetime.today())
-        digunakan_oleh = st.text_input("Digunakan Oleh")
-        keperluan = st.text_area("Keperluan")
-        if st.button("Simpan"):
-            new_row = {
-                "Nama": nama,
-                "Kategori": kategori_penggunaan,
-                "Jumlah Digunakan": jumlah,
-                "Tanggal": tanggal,
-                "Digunakan Oleh": digunakan_oleh,
-                "Keperluan": keperluan
-            }
-            riwayat_df = pd.concat([riwayat_df, pd.DataFrame([new_row])], ignore_index=True)
-            riwayat_df.to_csv(RIWAYAT_FILE, index=False)
-            st.success("Riwayat penggunaan berhasil ditambahkan!")
-
-    elif kategori == "Pengembalian Alat":
-        st.subheader("🔄 Pengembalian Alat")
-        if alat_df.empty:
-            st.warning("Data alat kosong. Tambahkan data alat terlebih dahulu.")
-        else:
-            alat_terpilih = st.selectbox("Pilih Alat yang Dikembalikan", alat_df["Nama Alat"].unique())
-            jumlah_dikembalikan = st.number_input("Jumlah Dikembalikan", min_value=1)
-            tanggal_kembali = st.date_input("Tanggal Pengembalian", value=datetime.today())
-            dikembalikan_oleh = st.text_input("Dikembalikan Oleh")
-            catatan = st.text_area("Catatan (Opsional)", "")
-
-            if st.button("Simpan Pengembalian"):
-                # Tambahkan jumlah alat
-                alat_df.loc[alat_df["Nama Alat"] == alat_terpilih, "Jumlah"] += jumlah_dikembalikan
-                alat_df.to_csv(ALAT_FILE, index=False)
-
-                # Tambah catatan ke riwayat
-                new_row = {
-                    "Nama": alat_terpilih,
-                    "Kategori": "Pengembalian Alat",
-                    "Jumlah Digunakan": -jumlah_dikembalikan,
-                    "Tanggal": tanggal_kembali,
-                    "Digunakan Oleh": dikembalikan_oleh,
-                    "Keperluan": f"Pengembalian alat. {catatan}"
-                }
-                riwayat_df = pd.concat([riwayat_df, pd.DataFrame([new_row])], ignore_index=True)
-                riwayat_df.to_csv(RIWAYAT_FILE, index=False)
-
-                st.success("Pengembalian alat berhasil disimpan!")
-
-
-    
+            st.success("✅ Riwayat penggunaan disimpan")
