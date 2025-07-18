@@ -40,30 +40,41 @@ if menu == "Stok Alat":
 elif menu == "Stok Bahan":
     st.subheader("🧪 Daftar Stok Bahan Kimia")
     df = bahan_df.copy()
-    df["Jumlah Awal"] = df["Jumlah"].str.extract(r'(\d+\.?\d*)').astype(float)
+    
+    # Ambil angka dan satuan dari kolom jumlah
+    df["Jumlah Awal"] = df["Jumlah"].str.extract(r'(\d+\.?\d*)')
     df["Satuan"] = df["Jumlah"].str.extract(r'([a-zA-Z]+)')
+    df["Jumlah Awal"] = pd.to_numeric(df["Jumlah Awal"], errors="coerce").fillna(0)
 
+    # Ambil total pemakaian dari riwayat
     penggunaan = riwayat_df[riwayat_df["Kategori"] == "Bahan"]
-    terpakai = penggunaan.groupby("Nama")["Jumlah"].apply(lambda x: pd.to_numeric(x, errors="coerce").sum()).reset_index(name="Terpakai")
+    penggunaan["Jumlah"] = pd.to_numeric(penggunaan["Jumlah"], errors="coerce")
+    terpakai = penggunaan.groupby("Nama")["Jumlah"].sum().reset_index(name="Terpakai")
+    
     df = df.merge(terpakai, how="left", left_on="Nama Bahan", right_on="Nama")
     df["Terpakai"] = df["Terpakai"].fillna(0)
     df["Sisa"] = df["Jumlah Awal"] - df["Terpakai"]
-
+    
     def status(sisa, satuan):
-        if satuan == "ml":
-            return "❗ Menipis" if sisa < 50 else "Cukup"
-        if satuan == "g":
-            return "❗ Menipis" if sisa < 25 else "Cukup"
-        return "❗ Menipis" if sisa < 10 else "Cukup"
+        satuan = str(satuan).lower()
+        if satuan == "ml" and sisa < 50:
+            return "❗ Menipis"
+        elif satuan == "g" and sisa < 25:
+            return "❗ Menipis"
+        elif sisa < 10:
+            return "❗ Menipis"
+        return "Cukup"
 
-    df["Status"] = df.apply(lambda row: status(row["Sisa"], str(row["Satuan"]).lower()), axis=1)
+    df["Status"] = df.apply(lambda row: status(row["Sisa"], row["Satuan"]), axis=1)
     if "❗ Menipis" in df["Status"].values:
         st.warning("⚠️ Beberapa bahan hampir habis!")
 
     st.dataframe(df[["Nama Bahan", "Jumlah", "Terpakai", "Sisa", "Satuan", "Status", "Expired", "Tempat"]])
+
     search = st.text_input("🔍 Cari bahan:")
     if search:
         st.dataframe(df[df["Nama Bahan"].str.contains(search, case=False)])
+
 
 # ---------- Riwayat ----------
 elif menu == "Riwayat":
@@ -138,7 +149,14 @@ elif menu == "Tambah Data":
 # ---------- Stok per Lemari ----------
 elif menu == "Stok per Lemari":
     st.subheader("📦 Total Stok di Tiap Tempat Penyimpanan")
-    bahan_df["Jumlah Angka"] = bahan_df["Jumlah"].str.extract(r'(\d+\.?\d*)').astype(float)
-    hasil = bahan_df.groupby("Tempat")["Jumlah Angka"].sum().reset_index()
-    hasil.columns = ["Tempat", "Total Bahan"]
+    df = bahan_df.copy()
+    
+    df["Jumlah Angka"] = df["Jumlah"].str.extract(r'(\d+\.?\d*)')
+    df["Jumlah Angka"] = pd.to_numeric(df["Jumlah Angka"], errors="coerce").fillna(0)
+    df["Tempat"] = df["Tempat"].fillna("Tidak Diketahui")
+
+    hasil = df.groupby("Tempat")["Jumlah Angka"].sum().reset_index()
+    hasil.columns = ["Tempat", "Total Jumlah"]
+    
     st.dataframe(hasil)
+
