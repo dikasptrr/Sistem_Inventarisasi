@@ -59,8 +59,8 @@ elif menu == "Tambah Data":
 
     with tab1:
         nama = st.text_input("Nama Bahan")
-        jumlah = st.number_input("Jumlah", min_value=0.0)
-        satuan = st.selectbox("Satuan", ["g", "mg", "kg", "ml", "L"])
+        jumlah = st.number_input("Jumlah", min_value=0.00)
+        satuan = st.selectbox("Satuan", ["g", "mg", "kg", "mL", "L"])
         tempat = st.text_input("Tempat Penyimpanan")
         expired = st.date_input("Tanggal Expired")
         if st.button("Simpan Bahan"):
