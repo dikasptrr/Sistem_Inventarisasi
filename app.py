@@ -39,21 +39,34 @@ if menu == "Stok Alat":
 # ---------- Tampilan Stok Bahan ----------
 elif menu == "Stok Bahan":
     st.subheader("🧪 Daftar Stok Bahan Kimia")
+    
     df = bahan_df.copy()
 
-    df["Jumlah Awal"] = df["Jumlah"].str.extract(r'(\d+\.?\d*)')
-    df["Satuan"] = df["Jumlah"].str.extract(r'([a-zA-Z]+)')
-    df["Jumlah Awal"] = pd.to_numeric(df["Jumlah Awal"], errors="coerce").fillna(0)
+    # Pastikan kolom-kolom yang diperlukan ada
+    required_columns = ["Nama Bahan", "Jumlah", "Tanggal Expired", "Tempat Penyimpanan"]
+    for col in required_columns:
+        if col not in df.columns:
+            st.error(f"❌ Kolom '{col}' tidak ditemukan di stok_bahan.csv")
+            st.stop()
 
-    # Ambil data penggunaan
+    # Ekstrak angka dan satuan
+    df["Jumlah Awal"] = df["Jumlah"].str.extract(r"(\d+\.?\d*)").astype(float)
+    df["Satuan"] = df["Jumlah"].str.extract(r"([a-zA-Z]+)")
+
+    # Hitung pemakaian dari riwayat
     penggunaan = riwayat_df[riwayat_df["Kategori"] == "Bahan"]
     penggunaan["Jumlah"] = pd.to_numeric(penggunaan["Jumlah"], errors="coerce")
     terpakai = penggunaan.groupby("Nama")["Jumlah"].sum().reset_index(name="Terpakai")
 
+    # Merge berdasarkan Nama Bahan → Nama
     df = df.merge(terpakai, how="left", left_on="Nama Bahan", right_on="Nama")
     df["Terpakai"] = df["Terpakai"].fillna(0)
+    df.drop(columns=["Nama"], inplace=True, errors="ignore")
+
+    # Hitung sisa
     df["Sisa"] = df["Jumlah Awal"] - df["Terpakai"]
 
+    # Status
     def status(sisa, satuan):
         satuan = str(satuan).lower()
         if satuan == "ml" and sisa < 50:
@@ -62,17 +75,20 @@ elif menu == "Stok Bahan":
             return "❗ Menipis"
         elif sisa < 10:
             return "❗ Menipis"
-        return "Cukup"
+        return "✅ Cukup"
 
     df["Status"] = df.apply(lambda row: status(row["Sisa"], row["Satuan"]), axis=1)
 
+    # Tampilkan tabel
     st.dataframe(df[[
         "Nama Bahan", "Jumlah", "Terpakai", "Sisa", "Satuan", "Status", "Tanggal Expired", "Tempat Penyimpanan"
     ]])
 
     search = st.text_input("🔍 Cari bahan:")
     if search:
-        st.dataframe(df[df["Nama Bahan"].str.contains(search, case=False)])
+        hasil = df[df["Nama Bahan"].str.contains(search, case=False)]
+        st.dataframe(hasil)
+
 
 # ---------- Riwayat ----------
 elif menu == "Riwayat":
