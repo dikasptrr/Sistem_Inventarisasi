@@ -31,7 +31,7 @@ def load_data():
 alat_df, bahan_df, riwayat_df = load_data()
 
 # --- Sidebar Menu ---
-st.title("📒 Logbook Inventarisasi Laboratorium Kimia Politeknik AKA Bogor")
+st.title("📒 Inventarisasi Laboratorium Kimia Politeknik AKA Bogor")
 menu = st.sidebar.selectbox("Menu", ["Stok Alat", "Stok Bahan", "Riwayat Penggunaan", "Tambah Data"])
 
 # --- Tampilan Stok Alat ---
@@ -120,7 +120,7 @@ elif menu == "Tambah Data":
     elif kategori == "Bahan":
         st.subheader("🧾 Tambah Bahan")
         nama = st.text_input("Nama Bahan")
-        jumlah = st.text_input("Jumlah (mis. 500 ml / 1 kg)")
+        jumlah = st.text_input("Jumlah (mis. 500 mL / 1 kg)")
         expired = st.date_input("Tanggal Kedaluwarsa")
         lokasi = st.text_input("Tempat Penyimpanan")
         if st.button("Simpan"):
