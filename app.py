@@ -86,7 +86,7 @@ elif menu == "Tambah Data" and role == "Laboran":
         tempat = st.text_input("Tempat Penyimpanan")
         expired = st.date_input("Tanggal Expired")
         if st.button("Simpan Bahan"):
-            new = pd.DataFrame([[nama, jumlah, satuan, tempat penyimpanan, expired]], columns=bahan_df.columns)
+            new = pd.DataFrame([[nama, jumlah, satuan, tempat, expired]], columns=bahan_df.columns)
             bahan_df = pd.concat([bahan_df, new], ignore_index=True)
             bahan_df.to_csv(BAHAN_FILE, index=False)
             st.success("✅ Data bahan disimpan")
@@ -96,7 +96,7 @@ elif menu == "Tambah Data" and role == "Laboran":
         jumlah = st.number_input("Jumlah", min_value=0)
         lokasi = st.text_input("Lokasi Penyimpanan")
         if st.button("Simpan Alat"):
-            new = pd.DataFrame([[nama, jumlah, Tempat Penyimpanan]], columns=alat_df.columns)
+            new = pd.DataFrame([[nama, jumlah, lokasi]], columns=alat_df.columns)
             alat_df = pd.concat([alat_df, new], ignore_index=True)
             alat_df.to_csv(ALAT_FILE, index=False)
             st.success("✅ Data alat disimpan")
@@ -183,3 +183,16 @@ elif menu == "Transaksi Lab" and role == "Laboran":
             riwayat_df = pd.concat([riwayat_df, new], ignore_index=True)
             riwayat_df.to_csv(RIWAYAT_FILE, index=False)
             st.success("✅ Pengambilan bahan disimpan")
+
+# ------------------------------
+# 7. LOGBOOK PEMAKAIAN (Mahasiswa)
+# ------------------------------
+elif menu == "Logbook Pemakaian" and role == "Mahasiswa":
+    st.subheader("📃 Logbook Pemakaian Pribadi")
+    nama_pengguna = st.text_input("Nama Mahasiswa")
+
+    if nama_pengguna:
+        logbook = riwayat_df[riwayat_df["Pengguna"].str.contains(nama_pengguna, case=False, na=False)]
+        st.dataframe(logbook)
+    else:
+        st.info("Masukkan nama Anda untuk melihat logbook penggunaan.")
