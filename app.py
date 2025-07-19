@@ -2,26 +2,9 @@ import streamlit as st
 import pandas as pd
 import os
 from datetime import datetime
-import base64
-set_background("dc13a165-96a5-42ff-be2d-c9e16d0e3c72.png")
 
 # Konfigurasi halaman
 st.set_page_config(page_title="Inventarisasi Lab Kimia", page_icon="🧪", layout="wide")
-
-def set_background(image_path):
-    with open(image_path, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode()
-    css = f"""
-    <style>
-    .stApp {{
-        background-image: url("data:image/png;base64,{encoded}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-    }}
-    </style>
-    """
-    st.markdown(css, unsafe_allow_html=True)
 
 # Judul & Tabel
 st.markdown("""
