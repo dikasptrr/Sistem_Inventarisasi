@@ -143,22 +143,28 @@ elif role in ["Mahasiswa", "Dosen"]:
     elif menu == "Isi Logbook Pemakaian":
         sub_menu = st.radio("Pilih Jenis Logbook", ["Penggunaan Bahan Kimia", "Peminjaman & Pengembalian Alat"])
 
-        if sub_menu == "Penggunaan Bahan Kimia":
-            st.title("🧪 Logbook Penggunaan Bahan Kimia")
-            nama = st.text_input("Nama Bahan")
+    elif sub_menu == "Penggunaan Bahan Kimia":
+        st.title("🧪 Logbook Penggunaan Bahan Kimia")
+
+        if not df_bahan.empty:
+            nama = st.selectbox("Pilih Bahan", df_bahan["Nama"].unique())
             jumlah = st.number_input("Jumlah", min_value=0.01, step=0.01)
             satuan = st.selectbox("Satuan", ["g", "ml"])
             tanggal = st.date_input("Tanggal")
             keterangan = st.text_area("Keterangan")
 
-            if st.button("Catat Penggunaan"):
-                if nama and pengguna:
-                    new = pd.DataFrame([[nama, "Bahan", f"{jumlah} {satuan}", tanggal, pengguna, keterangan]], columns=df_riwayat.columns)
-                    df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
-                    save_data(df_bahan, df_alat, df_riwayat)
-                    st.success("✅ Penggunaan dicatat.")
-                else:
-                    st.error("⚠️ Lengkapi semua data.")
+        if st.button("Catat Penggunaan"):
+            if nama and pengguna:
+                new = pd.DataFrame([[nama, "Bahan", f"{jumlah} {satuan}", tanggal, pengguna, keterangan]],
+                                   columns=df_riwayat.columns)
+                df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
+                save_data(df_bahan, df_alat, df_riwayat)
+                st.success("✅ Penggunaan dicatat.")
+            else:
+                st.error("⚠️ Lengkapi semua data.")
+    else:
+        st.warning("❗ Data bahan belum tersedia.")
+
 
         elif sub_menu == "Peminjaman & Pengembalian Alat":
             st.title("🔄 Peminjaman & Pengembalian Alat")
