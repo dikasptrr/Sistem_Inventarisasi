@@ -68,7 +68,9 @@ pengguna = st.sidebar.text_input("Nama Pengguna")
 # Load CSV
 df_bahan, df_alat, df_riwayat = load_data()
 
-# LABORAN
+# ========================================================================
+# MENU LABORAN
+# ========================================================================
 if role == "Laboran":
     menu = st.sidebar.selectbox("📋 Menu", [
         "Stok Bahan Kimia", "Stok Alat Laboratorium", "Logbook Pemakaian"
@@ -126,7 +128,9 @@ if role == "Laboran":
             df_log.index.name = "No"
             st.dataframe(df_log)
 
-# MAHASISWA & DOSEN
+# ========================================================================
+# MENU MAHASISWA / DOSEN
+# ========================================================================
 elif role in ["Mahasiswa", "Dosen"]:
     menu = st.sidebar.selectbox("📋 Menu", [
         "Stok Bahan Kimia", "Stok Alat Laboratorium", "Isi Logbook Pemakaian"
@@ -143,7 +147,7 @@ elif role in ["Mahasiswa", "Dosen"]:
     elif menu == "Isi Logbook Pemakaian":
         sub_menu = st.radio("Pilih Jenis Logbook", ["Penggunaan Bahan Kimia", "Peminjaman & Pengembalian Alat"])
 
-        elif sub_menu == "Penggunaan Bahan Kimia":
+        if sub_menu == "Penggunaan Bahan Kimia":
             st.title("🧪 Logbook Penggunaan Bahan Kimia")
             if not df_bahan.empty:
                 nama = st.selectbox("Pilih Bahan", df_bahan["Nama"].unique())
@@ -151,19 +155,18 @@ elif role in ["Mahasiswa", "Dosen"]:
                 satuan = st.selectbox("Satuan", ["g", "ml"])
                 tanggal = st.date_input("Tanggal")
                 keterangan = st.text_area("Keterangan")
-                
+
                 if st.button("Catat Penggunaan"):
                     if nama and pengguna:
                         new = pd.DataFrame([[nama, "Bahan", f"{jumlah} {satuan}", tanggal, pengguna, keterangan]],
-                                   columns=df_riwayat.columns)
+                                           columns=df_riwayat.columns)
                         df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
                         save_data(df_bahan, df_alat, df_riwayat)
                         st.success("✅ Penggunaan dicatat.")
                     else:
                         st.error("⚠️ Lengkapi semua data.")
-        else:
-            st.warning("❗ Data bahan belum tersedia.")
-
+            else:
+                st.warning("❗ Data bahan belum tersedia.")
 
         elif sub_menu == "Peminjaman & Pengembalian Alat":
             st.title("🔄 Peminjaman & Pengembalian Alat")
@@ -189,4 +192,4 @@ elif role in ["Mahasiswa", "Dosen"]:
                     save_data(df_bahan, df_alat, df_riwayat)
                     st.success(f"✅ Alat berhasil {aksi.lower()}.")
             else:
-                st.warning("Belum ada data alat.")
+                st.warning("❗ Data alat belum tersedia.")
