@@ -87,7 +87,7 @@ if peran == "Laboran":
             df_alat = load_data(STOK_ALAT_PATH)
             if nama_alat in df_alat["Nama"].values:
                 df_alat.loc[df_alat["Nama"] == nama_alat, "Jumlah"] += jumlah
-            elif:
+            elif
                 df_baru = pd.DataFrame([[nama_alat, jumlah, satuan, tempat]], columns=df_alat.columns)
                 df_alat = pd.concat([df_alat, df_baru], ignore_index=True)
             save_data(df_alat, STOK_ALAT_PATH)
