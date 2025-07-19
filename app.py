@@ -171,5 +171,5 @@ elif menu == "Logbook Pemakaian":
             save_data(bahan_df, alat_df, riwayat_df)
             st.success("Penggunaan berhasil dicatat.")
         else:
-            st.error("Nama barang harus diis
+            st.error("Nama barang harus diisi.")
 
