@@ -148,28 +148,26 @@ elif role in ["Mahasiswa", "Dosen"]:
         st.dataframe(alat_df)
 
     elif menu == "Logbook Pemakaian":
-    st.title("Isi Logbook Pemakaian")
-    nama = st.text_input("Nama Barang")
-    kategori = st.selectbox("Kategori", ["Bahan", "Alat"])
+        st.title("Isi Logbook Pemakaian")
+        nama = st.text_input("Nama Barang")
+        kategori = st.selectbox("Kategori", ["Bahan", "Alat"])
 
-    # Input jumlah sesuai tipe
-    if kategori == "Alat":
-        jumlah = st.number_input("Jumlah", min_value=1, step=1, format="%d")
-        satuan = "buah"
-    else:  # Bahan
-        jumlah = st.number_input("Jumlah", min_value=0.1, step=0.1, format="%.2f")
-        satuan = st.selectbox("Satuan", ["g", "ml"])
-
-    tanggal = st.date_input("Tanggal")
-    keterangan = st.text_area("Keterangan")
-
-    if st.button("Catat Pemakaian"):
-        if nama:
-            jumlah_akhir = f"{jumlah} {satuan}"
-            log = pd.DataFrame([[nama, kategori, jumlah_akhir, tanggal, pengguna, keterangan]], columns=riwayat_df.columns)
-            riwayat_df = pd.concat([riwayat_df, log], ignore_index=True)
-            save_data(bahan_df, alat_df, riwayat_df)
-            st.success("Penggunaan berhasil dicatat.")
+        if kategori == "Alat":
+            jumlah = st.number_input("Jumlah", min_value=1, step=1, format="%d")
+            satuan = "buah"
         else:
-            st.error("Nama barang harus diisi.")
+            jumlah = st.number_input("Jumlah", min_value=0.1, step=0.1, format="%.2f")
+            satuan = st.selectbox("Satuan", ["g", "ml"])
 
+        tanggal = st.date_input("Tanggal")
+        keterangan = st.text_area("Keterangan")
+
+        if st.button("Catat Pemakaian"):
+            if nama:
+                jumlah_akhir = f"{jumlah} {satuan}"
+                log = pd.DataFrame([[nama, kategori, jumlah_akhir, tanggal, pengguna, keterangan]], columns=riwayat_df.columns)
+                riwayat_df = pd.concat([riwayat_df, log], ignore_index=True)
+                save_data(bahan_df, alat_df, riwayat_df)
+                st.success("Penggunaan berhasil dicatat.")
+            else:
+                st.error("Nama barang harus diisi.")
