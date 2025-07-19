@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import os
@@ -196,7 +195,7 @@ elif role in ["Mahasiswa", "Dosen"]:
                                 if aksi == "Pinjam":
                                      if df_alat.at[idx, "Jumlah"] >= jumlah:
                                         df_alat.at[idx, "Jumlah"] -= jumlah
-                                    else:
+                                     else:
                                         st.error(f"Jumlah alat '{alat}' tidak mencukupi.")
                                         continue
                                 elif aksi == "Kembalikan":
