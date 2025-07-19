@@ -4,12 +4,7 @@ import os
 from datetime import datetime
 
 # Konfigurasi halaman
-st.set_page_config(
-    page_title="Inventarisasi Lab Kimia",
-    page_icon="🧪",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+st.set_page_config(page_title="Inventarisasi Lab Kimia", page_icon="🧪", layout="wide")
 
 # Styling
 st.markdown("""
@@ -17,8 +12,6 @@ st.markdown("""
         [data-testid="stAppViewContainer"] {
             background-image: url("https://images.unsplash.com/photo-1581092580502-3d5c3c9e1cfa");
             background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
         }
         [data-testid="stSidebar"] {
             background-color: rgba(255, 255, 255, 0.85);
@@ -41,7 +34,7 @@ STOK_BAHAN = os.path.join(DATA_FOLDER, "stok_bahan.csv")
 STOK_ALAT = os.path.join(DATA_FOLDER, "stok_alat.csv")
 RIWAYAT = os.path.join(DATA_FOLDER, "riwayat_penggunaan.csv")
 
-# Inisialisasi file CSV jika belum ada
+# Inisialisasi file
 def initialize_file(path, columns):
     if not os.path.exists(path):
         pd.DataFrame(columns=columns).to_csv(path, index=False)
@@ -54,7 +47,6 @@ initialize_file(RIWAYAT, ["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "
 def load_data():
     return pd.read_csv(STOK_BAHAN), pd.read_csv(STOK_ALAT), pd.read_csv(RIWAYAT)
 
-# Simpan data
 def save_data(df_bahan, df_alat, df_riwayat):
     df_bahan.to_csv(STOK_BAHAN, index=False)
     df_alat.to_csv(STOK_ALAT, index=False)
@@ -65,16 +57,19 @@ st.sidebar.title("🔑 Login Pengguna")
 role = st.sidebar.selectbox("Pilih Peran", ["Mahasiswa", "Dosen", "Laboran"])
 pengguna = st.sidebar.text_input("Nama Pengguna")
 
-# Load semua data
+# Load data
 df_bahan, df_alat, df_riwayat = load_data()
 
-# Tampilan menu berdasarkan peran
+# LABORAN
 if role == "Laboran":
     menu = st.sidebar.selectbox("📋 Menu", ["Stok Bahan Kimia", "Stok Alat Laboratorium", "Logbook Pemakaian"])
 
     if menu == "Stok Bahan Kimia":
         st.title("📦 Stok Bahan Kimia")
-        st.dataframe(df_bahan.reset_index(drop=True).rename_axis('No').reset_index())
+        df_display = df_bahan.copy().reset_index(drop=True)
+        df_display.index += 1
+        df_display.index.name = "No"
+        st.dataframe(df_display)
 
         st.subheader("Tambah / Hapus Bahan")
         nama = st.text_input("Nama Bahan")
@@ -97,11 +92,14 @@ if role == "Laboran":
 
     elif menu == "Stok Alat Laboratorium":
         st.title("🔧 Stok Alat Laboratorium")
-        st.dataframe(df_alat.reset_index(drop=True).rename_axis('No').reset_index())
+        df_display = df_alat.copy().reset_index(drop=True)
+        df_display.index += 1
+        df_display.index.name = "No"
+        st.dataframe(df_display)
 
-        st.subheader("Tambah / Hapus / Tambah Jumlah Alat")
+        st.subheader("Tambah / Hapus Alat")
         nama = st.text_input("Nama Alat")
-        jumlah = st.number_input("Jumlah", min_value=1, step=1)
+        jumlah = st.number_input("Jumlah", min_value=0, step=1)
         lokasi = st.text_input("Lokasi")
 
         if st.button("Tambah Alat"):
@@ -109,12 +107,11 @@ if role == "Laboran":
                 if nama in df_alat["Nama"].values:
                     idx = df_alat[df_alat["Nama"] == nama].index[0]
                     df_alat.at[idx, "Jumlah"] += jumlah
-                    st.success("Jumlah alat ditambahkan.")
                 else:
                     new = pd.DataFrame([[nama, jumlah, lokasi]], columns=df_alat.columns)
                     df_alat = pd.concat([df_alat, new], ignore_index=True)
-                    st.success("Alat baru ditambahkan.")
                 save_data(df_bahan, df_alat, df_riwayat)
+                st.success("✅ Alat berhasil ditambahkan atau diperbarui.")
 
         if st.button("Hapus Alat"):
             df_alat = df_alat[df_alat["Nama"] != nama]
@@ -126,18 +123,28 @@ if role == "Laboran":
         if df_riwayat.empty:
             st.info("Belum ada catatan.")
         else:
-            st.dataframe(df_riwayat.reset_index(drop=True).rename_axis("No").reset_index())
+            df_display = df_riwayat.copy().reset_index(drop=True)
+            df_display.index += 1
+            df_display.index.name = "No"
+            st.dataframe(df_display)
 
+# MAHASISWA & DOSEN
 elif role in ["Mahasiswa", "Dosen"]:
     menu = st.sidebar.selectbox("📋 Menu", ["Stok Bahan Kimia", "Stok Alat Laboratorium", "Isi Logbook Pemakaian"])
 
     if menu == "Stok Bahan Kimia":
         st.title("📦 Stok Bahan Kimia")
-        st.dataframe(df_bahan.reset_index(drop=True).rename_axis('No').reset_index())
+        df_display = df_bahan.copy().reset_index(drop=True)
+        df_display.index += 1
+        df_display.index.name = "No"
+        st.dataframe(df_display)
 
     elif menu == "Stok Alat Laboratorium":
         st.title("🔧 Stok Alat Laboratorium")
-        st.dataframe(df_alat.reset_index(drop=True).rename_axis('No').reset_index())
+        df_display = df_alat.copy().reset_index(drop=True)
+        df_display.index += 1
+        df_display.index.name = "No"
+        st.dataframe(df_display)
 
     elif menu == "Isi Logbook Pemakaian":
         sub_menu = st.radio("Pilih Jenis Logbook", ["Penggunaan Bahan Kimia", "Peminjaman & Pengembalian Alat"])
@@ -148,7 +155,7 @@ elif role in ["Mahasiswa", "Dosen"]:
                 nama = st.selectbox("Pilih Bahan", df_bahan["Nama"].unique())
                 jumlah = st.number_input("Jumlah", min_value=0.01, step=0.01)
                 satuan = st.selectbox("Satuan", ["g", "ml"])
-                tanggal = st.date_input("Tanggal", value=datetime.today())
+                tanggal = st.date_input("Tanggal")
                 keterangan = st.text_area("Keterangan")
 
                 if st.button("Catat Penggunaan"):
@@ -157,9 +164,9 @@ elif role in ["Mahasiswa", "Dosen"]:
                                            columns=df_riwayat.columns)
                         df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
                         save_data(df_bahan, df_alat, df_riwayat)
-                        st.success("✅ Penggunaan bahan berhasil dicatat.")
-            else:
-                st.warning("Data bahan belum tersedia.")
+                        st.success("✅ Penggunaan dicatat.")
+                    else:
+                        st.error("⚠️ Lengkapi semua data.")
 
         elif sub_menu == "Peminjaman & Pengembalian Alat":
             st.title("🔄 Peminjaman & Pengembalian Alat")
@@ -167,7 +174,7 @@ elif role in ["Mahasiswa", "Dosen"]:
                 nama_alat = st.selectbox("Pilih Alat", df_alat["Nama"].unique())
                 jumlah = st.number_input("Jumlah", min_value=1, step=1)
                 aksi = st.radio("Aksi", ["Pinjam", "Kembalikan"])
-                tanggal = st.date_input("Tanggal", value=datetime.today())
+                tanggal = st.date_input("Tanggal")
                 keterangan = st.text_area("Keterangan")
 
                 if st.button("Simpan Log"):
