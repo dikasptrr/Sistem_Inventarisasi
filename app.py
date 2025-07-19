@@ -87,19 +87,15 @@ if peran == "Laboran":
             df_alat = load_data(STOK_ALAT_PATH)
             if nama_alat in df_alat["Nama"].values:
                 df_alat.loc[df_alat["Nama"] == nama_alat, "Jumlah"] += jumlah
-            else:
+            elif:
                 df_baru = pd.DataFrame([[nama_alat, jumlah, satuan, tempat]], columns=df_alat.columns)
                 df_alat = pd.concat([df_alat, df_baru], ignore_index=True)
             save_data(df_alat, STOK_ALAT_PATH)
             st.success("Alat berhasil ditambahkan atau diperbarui.")
-
-        st.markdown("### Hapus Alat dari Data")
-        alat_untuk_dihapus = st.selectbox("Pilih Alat untuk Dihapus", df_alat["Nama"].unique().tolist())
-        if st.button("Hapus Alat Ini"):
-            df_alat = df_alat[df_alat["Nama"] != alat_untuk_dihapus]
+            else: 
+                df_alat = df_alat[df_alat["Nama"] != alat_untuk_dihapus]
             save_data(df_alat, STOK_ALAT_PATH)
             st.success(f"Alat '{alat_untuk_dihapus}' berhasil dihapus.")
-
 
     elif menu == "Logbook Pemakaian":
         st.title("📖 Logbook Pemakaian")
