@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from datetime import datetime
 
-# Konfigurasi halaman
+# --- Konfigurasi halaman ---
 st.set_page_config(
     page_title="Inventarisasi Lab Kimia",
     page_icon="🧪",
@@ -11,34 +11,30 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Wallpaper atau latar belakang hiasan
-page_bg_img = '''
-<style>
-[data-testid="stAppViewContainer"] {
-    background-image: url("https://images.unsplash.com/photo-1581092580502-3d5c3c9e1cfa");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
+# --- Wallpaper dan styling ---
+st.markdown("""
+    <style>
+        [data-testid="stAppViewContainer"] {
+            background-image: url("https://images.unsplash.com/photo-1581092580502-3d5c3c9e1cfa");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        [data-testid="stSidebar"] {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        h1, h2, h3 {
+            color: #003366;
+        }
+        .stButton>button {
+            background-color: #006699;
+            color: white;
+            border-radius: 10px;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-[data-testid="stSidebar"] {
-    background-color: rgba(255, 255, 255, 0.8);
-}
-
-h1, h2, h3 {
-    color: #003366;
-}
-
-.stButton>button {
-    background-color: #006699;
-    color: white;
-    border-radius: 10px;
-}
-</style>
-'''
-st.markdown(page_bg_img, unsafe_allow_html=True)
-
-# Path file CSV
+# --- Path file CSV ---
 DATA_FOLDER = "data"
 STOK_BAHAN = os.path.join(DATA_FOLDER, "stok_bahan.csv")
 STOK_ALAT = os.path.join(DATA_FOLDER, "stok_alat.csv")
@@ -46,6 +42,7 @@ RIWAYAT_FILE = os.path.join(DATA_FOLDER, "riwayat_penggunaan.csv")
 
 os.makedirs(DATA_FOLDER, exist_ok=True)
 
+# --- Inisialisasi file jika belum ada ---
 def initialize_file(filepath, columns):
     if not os.path.exists(filepath):
         pd.DataFrame(columns=columns).to_csv(filepath, index=False)
@@ -54,30 +51,20 @@ initialize_file(STOK_BAHAN, ["Nama", "Jumlah", "Satuan", "Tempat Penyimpanan", "
 initialize_file(STOK_ALAT, ["Nama", "Jumlah", "Lokasi"])
 initialize_file(RIWAYAT_FILE, ["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "Keterangan"])
 
+# --- Load Data ---
 def load_data():
-    try:
-        bahan_df = pd.read_csv(STOK_BAHAN)
-    except:
-        bahan_df = pd.DataFrame(columns=["Nama", "Jumlah", "Satuan", "Tempat Penyimpanan", "Tanggal Expired"])
-    
-    try:
-        alat_df = pd.read_csv(STOK_ALAT)
-    except:
-        alat_df = pd.DataFrame(columns=["Nama", "Jumlah", "Lokasi"])
-    
-    try:
-        riwayat_df = pd.read_csv(RIWAYAT_FILE)
-    except:
-        riwayat_df = pd.DataFrame(columns=["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "Keterangan"])
-    
+    bahan_df = pd.read_csv(STOK_BAHAN)
+    alat_df = pd.read_csv(STOK_ALAT)
+    riwayat_df = pd.read_csv(RIWAYAT_FILE)
     return bahan_df, alat_df, riwayat_df
 
+# --- Simpan Data ---
 def save_data(bahan_df, alat_df, riwayat_df):
     bahan_df.to_csv(STOK_BAHAN, index=False)
     alat_df.to_csv(STOK_ALAT, index=False)
     riwayat_df.to_csv(RIWAYAT_FILE, index=False)
 
-# Sidebar Login
+# === Login Pengguna ===
 st.sidebar.title("🔑 Login Pengguna")
 role = st.sidebar.selectbox("Pilih Peran", ["Mahasiswa", "Dosen", "Laboran"])
 pengguna = st.sidebar.text_input("Nama Pengguna", key="pengguna")
@@ -103,7 +90,7 @@ if role == "Laboran":
         satuan = st.selectbox("Satuan", ["g", "ml"])
         tempat = st.text_input("Tempat Penyimpanan")
         expired = st.date_input("Tanggal Expired")
-        
+
         if st.button("Tambah Bahan"):
             if nama_bahan:
                 new = pd.DataFrame([[nama_bahan, jumlah, satuan, tempat, expired]], columns=bahan_df.columns)
@@ -168,12 +155,14 @@ if role == "Laboran":
             st.warning("⚠️ Belum ada data alat.")
 
     elif menu == "Logbook Pemakaian":
-        st.title("📘 Logbook Pemakaian (Monitoring)")
+        st.title("📘 Logbook Pemakaian")
         st.dataframe(riwayat_df)
 
-# === MAHASISWA / DOSEN ===
+# === MAHASISWA & DOSEN ===
 elif role in ["Mahasiswa", "Dosen"]:
-    menu = st.sidebar.selectbox("📋 Menu", ["Stok Bahan Kimia", "Stok Alat Laboratorium", "Isi Logbook Pemakaian"])
+    menu = st.sidebar.selectbox("📋 Menu", [
+        "Stok Bahan Kimia", "Stok Alat Laboratorium", "Isi Logbook Pemakaian"
+    ])
 
     if menu == "Stok Bahan Kimia":
         st.title("📦 Stok Bahan Kimia")
@@ -183,29 +172,28 @@ elif role in ["Mahasiswa", "Dosen"]:
         st.title("🔧 Stok Alat Laboratorium")
         st.dataframe(alat_df)
 
-elif menu == "Isi Logbook Pemakaian":
-    st.title("📝 Isi Logbook Pemakaian")
-    nama = st.text_input("Nama Barang")
-    kategori = st.selectbox("Kategori", ["Bahan", "Alat"])
-    nama_pengguna = st.text_input("Nama Pengguna (yang menggunakan)", value=pengguna)
+    elif menu == "Isi Logbook Pemakaian":
+        st.title("📝 Isi Logbook Pemakaian")
+        nama = st.text_input("Nama Barang")
+        kategori = st.selectbox("Kategori", ["Bahan", "Alat"])
+        nama_pengguna = st.text_input("Nama Pengguna", value=pengguna)
 
-    if kategori == "Alat":
-        jumlah = st.number_input("Jumlah", min_value=1, step=1, format="%d")
-        satuan = "buah"
-    else:
-        jumlah = st.number_input("Jumlah", min_value=0.01, step=0.1, format="%.2f")
-        satuan = st.selectbox("Satuan", ["g", "ml"])
-
-    tanggal = st.date_input("Tanggal")
-    keterangan = st.text_area("Keterangan")
-
-    if st.button("Catat Pemakaian"):
-        if nama and nama_pengguna:
-            jumlah_akhir = f"{jumlah} {satuan}"
-            log = pd.DataFrame([[nama, kategori, jumlah_akhir, tanggal, nama_pengguna, keterangan]], columns=riwayat_df.columns)
-            riwayat_df = pd.concat([riwayat_df, log], ignore_index=True)
-            save_data(bahan_df, alat_df, riwayat_df)
-            st.success("✅ Penggunaan berhasil dicatat.")
+        if kategori == "Alat":
+            jumlah = st.number_input("Jumlah", min_value=1, step=1, format="%d")
+            satuan = "buah"
         else:
-            st.error("⚠️ isi semua kolom yang ada.")
+            jumlah = st.number_input("Jumlah", min_value=0.01, step=0.01, format="%.2f")
+            satuan = st.selectbox("Satuan", ["g", "ml"])
 
+        tanggal = st.date_input("Tanggal")
+        keterangan = st.text_area("Keterangan")
+
+        if st.button("Catat Pemakaian"):
+            if nama and nama_pengguna:
+                jumlah_akhir = f"{jumlah} {satuan}"
+                log = pd.DataFrame([[nama, kategori, jumlah_akhir, tanggal, nama_pengguna, keterangan]], columns=riwayat_df.columns)
+                riwayat_df = pd.concat([riwayat_df, log], ignore_index=True)
+                save_data(bahan_df, alat_df, riwayat_df)
+                st.success("✅ Penggunaan berhasil dicatat.")
+            else:
+                st.error("⚠️ Isi semua kolom yang ada.")
