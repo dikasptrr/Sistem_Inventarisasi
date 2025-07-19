@@ -154,6 +154,7 @@ elif role in ["Mahasiswa", "Dosen"]:
         if sub_menu == "Penggunaan Bahan Kimia":
             st.title("🧪 Logbook Penggunaan Bahan Kimia")
             if not df_bahan.empty:
+                pengguna = st.text_input("Masukkan Nama Anda")
                 nama = st.selectbox("Pilih Bahan", df_bahan["Nama"].unique())
                 jumlah = st.number_input("Jumlah", min_value=0.01, step=0.01)
                 satuan = st.selectbox("Satuan", ["g", "ml"])
@@ -173,6 +174,7 @@ elif role in ["Mahasiswa", "Dosen"]:
         elif sub_menu == "Peminjaman & Pengembalian Alat":
             st.title("🔄 Peminjaman & Pengembalian Alat")
             if not df_alat.empty:
+                pengguna = st.text_input("Masukkan Nama Anda")
                 nama_alat = st.selectbox("Pilih Alat", df_alat["Nama"].unique())
                 jumlah = st.number_input("Jumlah", min_value=1, step=1)
                 aksi = st.radio("Aksi", ["Pinjam", "Kembalikan"])
