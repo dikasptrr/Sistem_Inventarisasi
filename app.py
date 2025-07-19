@@ -206,8 +206,8 @@ elif role in ["Mahasiswa", "Dosen"]:
                                 df_riwayat = pd.concat([df_riwayat, log], ignore_index=True)
                                 success_log.append(alat)
 
-                         if success_log:
-                             save_data(df_bahan, df_alat, df_riwayat)
-                             st.success(f"✅ Berhasil {aksi.lower()} alat: {', '.join(success_log)} oleh **{pengguna}**.")
+                             if success_log:
+                                save_data(df_bahan, df_alat, df_riwayat)
+                                st.success(f"✅ Berhasil {aksi.lower()} alat: {', '.join(success_log)} oleh **{pengguna}**.")
                     else:
                         st.warning("Belum ada data alat.")
