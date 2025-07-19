@@ -171,29 +171,44 @@ elif role in ["Mahasiswa", "Dosen"]:
                     else:
                         st.error("⚠️ Lengkapi semua data.")
                         
-        elif sub_menu == "Peminjaman & Pengembalian Alat":
-            st.title("🔄 Peminjaman & Pengembalian Alat")
-            if not df_alat.empty:
-                pengguna = st.text_input("Masukkan Nama Anda")
-                nama_alat = st.selectbox("Pilih Alat", df_alat["Nama"].unique())
-                jumlah = st.number_input("Jumlah", min_value=1, step=1)
-                aksi = st.radio("Aksi", ["Pinjam", "Kembalikan"])
-                tanggal = st.date_input("Tanggal")
-                keterangan = st.text_area("Keterangan")
+                elif sub_menu == "Peminjaman & Pengembalian Alat":
+                    st.title("🔄 Peminjaman & Pengembalian Alat")
+                    if not df_alat.empty:
+                        pengguna = st.text_input("Masukkan Nama Anda")
+                        selected_items = st.multiselect("Pilih Alat", df_alat["Nama"].unique())
 
-                if st.button("Simpan Log"):
-                    idx = df_alat[df_alat["Nama"] == nama_alat].index[0]
-                    if aksi == "Pinjam" and df_alat.at[idx, "Jumlah"] >= jumlah:
-                        df_alat.at[idx, "Jumlah"] -= jumlah
-                    elif aksi == "Kembalikan":
-                        df_alat.at[idx, "Jumlah"] += jumlah
+                        jumlah_dict = {}
+                        for item in selected_items:
+                            jumlah = st.number_input(f"Jumlah untuk {item}", min_value=1, step=1, key=item)
+                            jumlah_dict[item] = jumlah
+
+                        aksi = st.radio("Aksi", ["Pinjam", "Kembalikan"])
+                        tanggal = st.date_input("Tanggal")
+                        keterangan = st.text_area("Keterangan")
+
+                        if st.button("Simpan Log"):
+                            success_log = []
+                            for alat in selected_items:
+                                jumlah = jumlah_dict[alat]
+                                idx = df_alat[df_alat["Nama"] == alat].index[0]
+
+                                if aksi == "Pinjam":
+                                    if df_alat.at[idx, "Jumlah"] >= jumlah:
+                                        df_alat.at[idx, "Jumlah"] -= jumlah
+                                    else:
+                                        st.error(f"Jumlah alat '{alat}' tidak mencukupi.")
+                                        continue
+                                elif aksi == "Kembalikan":
+                                    df_alat.at[idx, "Jumlah"] += jumlah
+
+                                # Catat log
+                                log = pd.DataFrame([[alat, "Alat", jumlah, tanggal, pengguna, f"{aksi}: {keterangan}"]],
+                                           columns=df_riwayat.columns)
+                                df_riwayat = pd.concat([df_riwayat, log], ignore_index=True)
+                                success_log.append(alat)
+
+                            if success_log:
+                                save_data(df_bahan, df_alat, df_riwayat)
+                                st.success(f"✅ Berhasil {aksi.lower()} alat: {', '.join(success_log)} oleh **{pengguna}**.")
                     else:
-                        st.error("Jumlah tidak mencukupi.")
-                        st.stop()
-                    log = pd.DataFrame([[nama_alat, "Alat", jumlah, tanggal, pengguna, f"{aksi}: {keterangan}"]],
-                               columns=df_riwayat.columns)
-                    df_riwayat = pd.concat([df_riwayat, log], ignore_index=True)
-                    save_data(df_bahan, df_alat, df_riwayat)
-                    st.success(f"✅ Alat berhasil {aksi.lower()} oleh **{pengguna}**.")
-                    
-                st.warning("Belum ada data alat.")
+                        st.warning("Belum ada data alat.")
