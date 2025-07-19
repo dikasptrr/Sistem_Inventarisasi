@@ -2,30 +2,61 @@ import streamlit as st
 import pandas as pd
 import os
 from datetime import datetime
+import base64
+set_background("dc13a165-96a5-42ff-be2d-c9e16d0e3c72.png")
 
 # Konfigurasi halaman
 st.set_page_config(page_title="Inventarisasi Lab Kimia", page_icon="🧪", layout="wide")
 
-# Styling
+def set_background(image_path):
+    with open(image_path, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+    css = f"""
+    <style>
+    .stApp {{
+        background-image: url("data:image/png;base64,{encoded}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }}
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+# Judul & Tabel
+st.markdown("""
+    <h1 style='text-align: center; color: #4B0082;'>
+        📦 Stok Bahan Kimia
+    </h1>
+""", unsafe_allow_html=True)
+
+# Style Tombol
 st.markdown("""
     <style>
-        [data-testid="stAppViewContainer"] {
-            background-image: url("https://images.unsplash.com/photo-1581092580502-3d5c3c9e1cfa");
-            background-size: cover;
-        }
-        [data-testid="stSidebar"] {
-            background-color: rgba(255, 255, 255, 0.85);
-        }
-        h1, h2, h3 {
-            color: #003366;
-        }
-        .stButton>button {
-            background-color: #006699;
-            color: white;
-            border-radius: 10px;
-        }
+    div.stButton > button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 24px;
+        border-radius: 8px;
+        border: none;
+        font-size: 16px;
+        margin: 4px 2px;
+        transition-duration: 0.4s;
+    }
+    div.stButton > button:hover {
+        background-color: #45a049;
+        color: white;
+    }
     </style>
 """, unsafe_allow_html=True)
+
+# Style Sidebar
+with st.sidebar:
+    st.markdown("## 🔐 Login Pengguna")
+    st.selectbox("Pilih Peran", ["Mahasiswa", "Dosen", "Laboran"])
+    st.text_input("Nama Pengguna")
+    st.markdown("---")
+    st.markdown("## 📋 Menu")
 
 # Path file
 DATA_FOLDER = "data"
