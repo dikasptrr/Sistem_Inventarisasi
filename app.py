@@ -152,15 +152,15 @@ elif role in ["Mahasiswa", "Dosen"]:
                 tanggal = st.date_input("Tanggal")
                 keterangan = st.text_area("Keterangan")
                 
-            if st.button("Catat Penggunaan"):
-                if nama and pengguna:
-                    new = pd.DataFrame([[nama, "Bahan", f"{jumlah} {satuan}", tanggal, pengguna, keterangan]],
+                if st.button("Catat Penggunaan"):
+                    if nama and pengguna:
+                        new = pd.DataFrame([[nama, "Bahan", f"{jumlah} {satuan}", tanggal, pengguna, keterangan]],
                                    columns=df_riwayat.columns)
-                    df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
-                    save_data(df_bahan, df_alat, df_riwayat)
-                    st.success("✅ Penggunaan dicatat.")
-                else:
-                    st.error("⚠️ Lengkapi semua data.")
+                        df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
+                        save_data(df_bahan, df_alat, df_riwayat)
+                        st.success("✅ Penggunaan dicatat.")
+                    else:
+                        st.error("⚠️ Lengkapi semua data.")
         else:
             st.warning("❗ Data bahan belum tersedia.")
 
