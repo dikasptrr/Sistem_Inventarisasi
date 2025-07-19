@@ -90,7 +90,6 @@ if role == "Laboran":
         "Stok Bahan Kimia",
         "Stok Alat Laboratorium",
         "Peminjaman & Pengembalian",
-        "Riwayat Penggunaan",
         "Logbook Pemakaian"
     ])
 
@@ -167,10 +166,6 @@ if role == "Laboran":
                 st.success(f"✅ Alat berhasil {aksi.lower()}.")
         else:
             st.warning("⚠️ Belum ada data alat.")
-
-    elif menu == "Riwayat Penggunaan":
-        st.title("🕓 Riwayat Penggunaan")
-        st.dataframe(riwayat_df)
 
     elif menu == "Logbook Pemakaian":
         st.title("📘 Logbook Pemakaian (Monitoring)")
