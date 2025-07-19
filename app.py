@@ -183,27 +183,29 @@ elif role in ["Mahasiswa", "Dosen"]:
         st.title("🔧 Stok Alat Laboratorium")
         st.dataframe(alat_df)
 
-    elif menu == "Isi Logbook Pemakaian":
-        st.title("📝 Isi Logbook Pemakaian")
-        nama = st.text_input("Nama Barang")
-        kategori = st.selectbox("Kategori", ["Bahan", "Alat"])
+elif menu == "Isi Logbook Pemakaian":
+    st.title("📝 Isi Logbook Pemakaian")
+    nama = st.text_input("Nama Barang")
+    kategori = st.selectbox("Kategori", ["Bahan", "Alat"])
+    nama_pengguna = st.text_input("Nama Pengguna (yang menggunakan)", value=pengguna)
 
-        if kategori == "Alat":
-            jumlah = st.number_input("Jumlah", min_value=1, step=1, format="%d")
-            satuan = "buah"
+    if kategori == "Alat":
+        jumlah = st.number_input("Jumlah", min_value=1, step=1, format="%d")
+        satuan = "buah"
+    else:
+        jumlah = st.number_input("Jumlah", min_value=0.01, step=0.1, format="%.2f")
+        satuan = st.selectbox("Satuan", ["g", "ml"])
+
+    tanggal = st.date_input("Tanggal")
+    keterangan = st.text_area("Keterangan")
+
+    if st.button("Catat Pemakaian"):
+        if nama and nama_pengguna:
+            jumlah_akhir = f"{jumlah} {satuan}"
+            log = pd.DataFrame([[nama, kategori, jumlah_akhir, tanggal, nama_pengguna, keterangan]], columns=riwayat_df.columns)
+            riwayat_df = pd.concat([riwayat_df, log], ignore_index=True)
+            save_data(bahan_df, alat_df, riwayat_df)
+            st.success("✅ Penggunaan berhasil dicatat.")
         else:
-            jumlah = st.number_input("Jumlah", min_value=0.01, step=0.1, format="%.2f")
-            satuan = st.selectbox("Satuan", ["g", "ml"])
+            st.error("⚠️ isi semua kolom yang ada.")
 
-        tanggal = st.date_input("Tanggal")
-        keterangan = st.text_area("Keterangan")
-
-        if st.button("Catat Pemakaian"):
-            if nama:
-                jumlah_akhir = f"{jumlah} {satuan}"
-                log = pd.DataFrame([[nama, kategori, jumlah_akhir, tanggal, pengguna, keterangan]], columns=riwayat_df.columns)
-                riwayat_df = pd.concat([riwayat_df, log], ignore_index=True)
-                save_data(bahan_df, alat_df, riwayat_df)
-                st.success("✅ Penggunaan berhasil dicatat.")
-            else:
-                st.error("⚠️ Nama barang harus diisi.")
