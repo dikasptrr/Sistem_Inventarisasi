@@ -3,6 +3,41 @@ import pandas as pd
 import os
 from datetime import datetime
 
+# Konfigurasi halaman
+st.set_page_config(
+    page_title="Inventarisasi Lab Kimia",
+    page_icon="🧪",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Wallpaper atau latar belakang hiasan
+page_bg_img = '''
+<style>
+[data-testid="stAppViewContainer"] {
+    background-image: url("https://images.unsplash.com/photo-1581092580502-3d5c3c9e1cfa");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+[data-testid="stSidebar"] {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+h1, h2, h3 {
+    color: #003366;
+}
+
+.stButton>button {
+    background-color: #006699;
+    color: white;
+    border-radius: 10px;
+}
+</style>
+'''
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
 # Path file CSV
 DATA_FOLDER = "data"
 STOK_BAHAN = os.path.join(DATA_FOLDER, "stok_bahan.csv")
@@ -42,19 +77,25 @@ def save_data(bahan_df, alat_df, riwayat_df):
     alat_df.to_csv(STOK_ALAT, index=False)
     riwayat_df.to_csv(RIWAYAT_FILE, index=False)
 
-# Sidebar
-st.sidebar.title("Login Pengguna")
-role = st.sidebar.selectbox("Pilih peran", ["Mahasiswa", "Dosen", "Laboran"])
+# Sidebar Login
+st.sidebar.title("🔑 Login Pengguna")
+role = st.sidebar.selectbox("Pilih Peran", ["Mahasiswa", "Dosen", "Laboran"])
 pengguna = st.sidebar.text_input("Nama Pengguna", key="pengguna")
 
 bahan_df, alat_df, riwayat_df = load_data()
 
-# Laboran View
+# === LABORAN ===
 if role == "Laboran":
-    menu = st.sidebar.selectbox("Menu", ["Stok Bahan Kimia", "Stok Alat Laboratorium", "Peminjaman & Pengembalian", "Riwayat Penggunaan", "Logbook Pemakaian"])
+    menu = st.sidebar.selectbox("📋 Menu", [
+        "Stok Bahan Kimia",
+        "Stok Alat Laboratorium",
+        "Peminjaman & Pengembalian",
+        "Riwayat Penggunaan",
+        "Logbook Pemakaian"
+    ])
 
     if menu == "Stok Bahan Kimia":
-        st.title("Stok Bahan Kimia")
+        st.title("📦 Stok Bahan Kimia")
         st.dataframe(bahan_df)
 
         st.subheader("Tambah / Hapus Bahan")
@@ -69,17 +110,17 @@ if role == "Laboran":
                 new = pd.DataFrame([[nama_bahan, jumlah, satuan, tempat, expired]], columns=bahan_df.columns)
                 bahan_df = pd.concat([bahan_df, new], ignore_index=True)
                 save_data(bahan_df, alat_df, riwayat_df)
-                st.success("Bahan ditambahkan.")
+                st.success("✅ Bahan berhasil ditambahkan.")
             else:
-                st.error("Nama bahan harus diisi.")
+                st.error("⚠️ Nama bahan harus diisi.")
 
         if st.button("Hapus Bahan"):
             bahan_df = bahan_df[bahan_df["Nama"] != nama_bahan]
             save_data(bahan_df, alat_df, riwayat_df)
-            st.success("Bahan dihapus.")
+            st.success("🗑️ Bahan berhasil dihapus.")
 
     elif menu == "Stok Alat Laboratorium":
-        st.title("Stok Alat Laboratorium")
+        st.title("🔧 Stok Alat Laboratorium")
         st.dataframe(alat_df)
 
         st.subheader("Tambah / Hapus Alat")
@@ -92,19 +133,19 @@ if role == "Laboran":
                 new = pd.DataFrame([[nama_alat, jumlah_alat, lokasi]], columns=alat_df.columns)
                 alat_df = pd.concat([alat_df, new], ignore_index=True)
                 save_data(bahan_df, alat_df, riwayat_df)
-                st.success("Alat ditambahkan.")
+                st.success("✅ Alat berhasil ditambahkan.")
             else:
-                st.error("Nama alat harus diisi.")
+                st.error("⚠️ Nama alat harus diisi.")
 
         if st.button("Hapus Alat"):
             alat_df = alat_df[alat_df["Nama"] != nama_alat]
             save_data(bahan_df, alat_df, riwayat_df)
-            st.success("Alat dihapus.")
+            st.success("🗑️ Alat berhasil dihapus.")
 
     elif menu == "Peminjaman & Pengembalian":
-        st.title("Peminjaman & Pengembalian Alat")
+        st.title("🔄 Peminjaman & Pengembalian Alat")
         if not alat_df.empty:
-            alat_dipilih = st.selectbox("Nama Alat", alat_df["Nama"].unique())
+            alat_dipilih = st.selectbox("Pilih Alat", alat_df["Nama"].unique())
             jumlah = st.number_input("Jumlah", min_value=1, step=1)
             aksi = st.radio("Aksi", ["Pinjam", "Kembalikan"])
             keterangan = st.text_input("Keterangan")
@@ -123,32 +164,32 @@ if role == "Laboran":
                                    columns=riwayat_df.columns)
                 riwayat_df = pd.concat([riwayat_df, log], ignore_index=True)
                 save_data(bahan_df, alat_df, riwayat_df)
-                st.success(f"Alat berhasil {aksi.lower()}.")
+                st.success(f"✅ Alat berhasil {aksi.lower()}.")
         else:
-            st.warning("Belum ada data alat.")
+            st.warning("⚠️ Belum ada data alat.")
 
     elif menu == "Riwayat Penggunaan":
-        st.title("Riwayat Penggunaan")
+        st.title("🕓 Riwayat Penggunaan")
         st.dataframe(riwayat_df)
 
     elif menu == "Logbook Pemakaian":
-        st.title("Logbook Pemakaian (Monitoring)")
+        st.title("📘 Logbook Pemakaian (Monitoring)")
         st.dataframe(riwayat_df)
 
-# Mahasiswa & Dosen View
+# === MAHASISWA / DOSEN ===
 elif role in ["Mahasiswa", "Dosen"]:
-    menu = st.sidebar.selectbox("Menu", ["Stok Bahan Kimia", "Stok Alat Laboratorium", "Logbook Pemakaian"])
+    menu = st.sidebar.selectbox("📋 Menu", ["Stok Bahan Kimia", "Stok Alat Laboratorium", "Isi Logbook Pemakaian"])
 
     if menu == "Stok Bahan Kimia":
-        st.title("Stok Bahan Kimia")
+        st.title("📦 Stok Bahan Kimia")
         st.dataframe(bahan_df)
 
     elif menu == "Stok Alat Laboratorium":
-        st.title("Stok Alat Laboratorium")
+        st.title("🔧 Stok Alat Laboratorium")
         st.dataframe(alat_df)
 
-    elif menu == "Logbook Pemakaian":
-        st.title("Isi Logbook Pemakaian")
+    elif menu == "Isi Logbook Pemakaian":
+        st.title("📝 Isi Logbook Pemakaian")
         nama = st.text_input("Nama Barang")
         kategori = st.selectbox("Kategori", ["Bahan", "Alat"])
 
@@ -156,7 +197,7 @@ elif role in ["Mahasiswa", "Dosen"]:
             jumlah = st.number_input("Jumlah", min_value=1, step=1, format="%d")
             satuan = "buah"
         else:
-            jumlah = st.number_input("Jumlah", min_value=0.1, step=0.1, format="%.2f")
+            jumlah = st.number_input("Jumlah", min_value=0.01, step=0.1, format="%.2f")
             satuan = st.selectbox("Satuan", ["g", "ml"])
 
         tanggal = st.date_input("Tanggal")
@@ -168,6 +209,6 @@ elif role in ["Mahasiswa", "Dosen"]:
                 log = pd.DataFrame([[nama, kategori, jumlah_akhir, tanggal, pengguna, keterangan]], columns=riwayat_df.columns)
                 riwayat_df = pd.concat([riwayat_df, log], ignore_index=True)
                 save_data(bahan_df, alat_df, riwayat_df)
-                st.success("Penggunaan berhasil dicatat.")
+                st.success("✅ Penggunaan berhasil dicatat.")
             else:
-                st.error("Nama barang harus diisi.")
+                st.error("⚠️ Nama barang harus diisi.")
