@@ -6,41 +6,6 @@ from datetime import datetime
 # Konfigurasi halaman
 st.set_page_config(page_title="Inventarisasi Lab Kimia", page_icon="🧪", layout="wide")
 
-# Judul & Tabel
-st.markdown("""
-    <h1 style='text-align: center; color: #4B0082;'>
-        📦 Stok Bahan Kimia
-    </h1>
-""", unsafe_allow_html=True)
-
-# Style Tombol
-st.markdown("""
-    <style>
-    div.stButton > button {
-        background-color: #4CAF50;
-        color: white;
-        padding: 10px 24px;
-        border-radius: 8px;
-        border: none;
-        font-size: 16px;
-        margin: 4px 2px;
-        transition-duration: 0.4s;
-    }
-    div.stButton > button:hover {
-        background-color: #45a049;
-        color: white;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# Style Sidebar
-with st.sidebar:
-    st.markdown("## 🔐 Login Pengguna")
-    st.selectbox("Pilih Peran", ["Mahasiswa", "Dosen", "Laboran"])
-    st.text_input("Nama Pengguna")
-    st.markdown("---")
-    st.markdown("## 📋 Menu")
-
 # Path file
 DATA_FOLDER = "data"
 os.makedirs(DATA_FOLDER, exist_ok=True)
