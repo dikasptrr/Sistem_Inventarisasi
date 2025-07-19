@@ -45,7 +45,12 @@ initialize_file(RIWAYAT, ["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "
 
 # Load data
 def load_data():
-    return pd.read_csv(STOK_BAHAN), pd.read_csv(STOK_ALAT), pd.read_csv(RIWAYAT)
+    df_bahan = pd.read_csv(STOK_BAHAN)
+    df_bahan["Jumlah"] = df_bahan["Jumlah"].astype(float)
+    df_alat = pd.read_csv(STOK_ALAT)
+    df_alat["Jumlah"] = df_alat["Jumlah"].astype(int)
+    df_riwayat = pd.read_csv(RIWAYAT)
+    return df_bahan, df_alat, df_riwayat
 
 def save_data(df_bahan, df_alat, df_riwayat):
     df_bahan.to_csv(STOK_BAHAN, index=False)
