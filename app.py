@@ -163,13 +163,21 @@ elif role in ["Mahasiswa", "Dosen"]:
 
                 if st.button("Catat Penggunaan"):
                     if nama and pengguna:
-                        new = pd.DataFrame([[nama, "Bahan", f"{jumlah} {satuan}", tanggal, pengguna, keterangan]],
-                                   columns=df_riwayat.columns)
-                        df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
-                        save_data(df_bahan, df_alat, df_riwayat)
-                        st.success(f"✅ Penggunaan dicatat oleh **{pengguna}**.")
+                        idx = df_bahan[df_bahan["Nama"] == nama].index[0]
+                        stok_saat_ini = df_bahan.at[idx, "Jumlah"]
+
+                        if stok_saat_ini >= jumlah:
+                            df_bahan.at[idx, "Jumlah"] -= jumlah  # kurangi stok
+                            new = pd.DataFrame([[nama, "Bahan", f"{jumlah} {satuan}", tanggal, pengguna, keterangan]],
+                                               columns=df_riwayat.columns)
+                            df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
+                            save_data(df_bahan, df_alat, df_riwayat)
+                            st.success(f"✅ Penggunaan dicatat oleh **{pengguna}**. Stok otomatis berkurang.")
+                        else:
+                            st.error(f"⚠️ Stok '{nama}' tidak mencukupi. Tersedia hanya {stok_saat_ini} {satuan}.")
                     else:
                         st.error("⚠️ Lengkapi semua data.")
+
                         
         elif sub_menu == "Peminjaman & Pengembalian Alat":
             st.title("🔄 Peminjaman & Pengembalian Alat")
