@@ -152,12 +152,18 @@ elif role in ["Mahasiswa", "Dosen"]:
         nama = st.text_input("Nama Barang")
         kategori = st.selectbox("Kategori", ["Bahan", "Alat"])
         jumlah = st.number_input("Jumlah", min_value=1.0)
+    if kategori == "Alat":
+        satuan = "buah"
+    elif kategori == "Bahan":
+        satuan = st.selectbox("Satuan", ["g", "ml"])
+    else:
+        satuan = ""
         tanggal = st.date_input("Tanggal")
         keterangan = st.text_area("Keterangan")
 
         if st.button("Catat Pemakaian"):
             if nama:
-                log = pd.DataFrame([[nama, kategori, jumlah, tanggal, pengguna, keterangan]], columns=riwayat_df.columns)
+                log = pd.DataFrame([[nama, kategori, f"{jumlah} {satuan}", tanggal, pengguna, keterangan]], columns=riwayat_df.columns)
                 riwayat_df = pd.concat([riwayat_df, log], ignore_index=True)
                 save_data(bahan_df, alat_df, riwayat_df)
                 st.success("Penggunaan berhasil dicatat.")
