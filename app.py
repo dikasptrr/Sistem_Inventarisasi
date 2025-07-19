@@ -156,7 +156,14 @@ if role == "Laboran":
 
     elif menu == "Logbook Pemakaian":
         st.title("📘 Logbook Pemakaian")
-        st.dataframe(riwayat_df)
+
+        if not riwayat_df.empty:
+            df_log = riwayat_df.reset_index(drop=True)
+            df_log.index = df_log.index + 1  # Mulai dari 1
+            df_log.index.name = "No"
+            st.dataframe(df_log)
+        else:
+            st.info("Belum ada catatan logbook.")
 
 # === MAHASISWA & DOSEN ===
 elif role in ["Mahasiswa", "Dosen"]:
