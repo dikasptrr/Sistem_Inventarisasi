@@ -72,7 +72,7 @@ if peran == "Laboran":
             save_data(df_bahan, STOK_BAHAN_PATH)
             st.success("Bahan berhasil ditambahkan atau diperbarui.")
 
-        elif menu == "Stok Alat Laboratorium":
+    elif menu == "Stok Alat Laboratorium":
         st.title("🔧 Stok Alat Laboratorium")
         df_alat = load_data(STOK_ALAT_PATH)
         st.dataframe(df_alat.reset_index(drop=True).rename(lambda x: x+1), use_container_width=True)
@@ -95,11 +95,11 @@ if peran == "Laboran":
 
         st.markdown("### Hapus Alat")
         alat_untuk_dihapus = st.selectbox("Pilih Alat yang Ingin Dihapus", df_alat["Nama"].tolist())
+        
         if st.button("Hapus Alat"):
             df_alat = df_alat[df_alat["Nama"] != alat_untuk_dihapus]
             save_data(df_alat, STOK_ALAT_PATH)
             st.success(f"Alat '{alat_untuk_dihapus}' berhasil dihapus.")
-
 
     elif menu == "Logbook Pemakaian":
         st.title("📖 Logbook Pemakaian")
