@@ -181,10 +181,9 @@ elif role in ["Mahasiswa", "Dosen"]:
                         for item in selected_items:
                             jumlah = st.number_input(f"Jumlah untuk {item}", min_value=1, step=1, key=item)
                             jumlah_dict[item] = jumlah
-
-                        aksi = st.radio("Aksi", ["Pinjam", "Kembalikan"])
-                        tanggal = st.date_input("Tanggal")
-                        keterangan = st.text_area("Keterangan")
+                            aksi = st.radio("Aksi", ["Pinjam", "Kembalikan"])
+                            tanggal = st.date_input("Tanggal")
+                            keterangan = st.text_area("Keterangan")
 
                         if st.button("Simpan Log"):
                             success_log = []
@@ -207,8 +206,8 @@ elif role in ["Mahasiswa", "Dosen"]:
                                 df_riwayat = pd.concat([df_riwayat, log], ignore_index=True)
                                 success_log.append(alat)
 
-                                if success_log:
-                                    save_data(df_bahan, df_alat, df_riwayat)
-                                    st.success(f"✅ Berhasil {aksi.lower()} alat: {', '.join(success_log)} oleh **{pengguna}**.")
-                        else:
-                            st.warning("Belum ada data alat.")
+                         if success_log:
+                             save_data(df_bahan, df_alat, df_riwayat)
+                             st.success(f"✅ Berhasil {aksi.lower()} alat: {', '.join(success_log)} oleh **{pengguna}**.")
+                    else:
+                        st.warning("Belum ada data alat.")
