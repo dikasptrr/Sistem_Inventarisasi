@@ -93,6 +93,14 @@ if peran == "Laboran":
             save_data(df_alat, STOK_ALAT_PATH)
             st.success("Alat berhasil ditambahkan atau diperbarui.")
 
+        st.markdown("### Hapus Alat dari Data")
+        alat_untuk_dihapus = st.selectbox("Pilih Alat untuk Dihapus", df_alat["Nama"].unique().tolist())
+        if st.button("Hapus Alat Ini"):
+            df_alat = df_alat[df_alat["Nama"] != alat_untuk_dihapus]
+            save_data(df_alat, STOK_ALAT_PATH)
+            st.success(f"Alat '{alat_untuk_dihapus}' berhasil dihapus.")
+
+
     elif menu == "Logbook Pemakaian":
         st.title("📖 Logbook Pemakaian")
         df_log = load_data(RIWAYAT_PENGGUNAAN_PATH)
