@@ -123,6 +123,8 @@ if role == "Laboran":
         if df_riwayat.empty:
             st.info("Belum ada catatan.")
         else:
+            df_display = df_riwayat.copy()
+            df_display = df_display.rename(columns={"Pengguna": "Nama Pengguna"})
             df_display = df_riwayat.copy().reset_index(drop=True)
             df_display.index += 1
             df_display.index.name = "No"
@@ -161,13 +163,13 @@ elif role in ["Mahasiswa", "Dosen"]:
                 if st.button("Catat Penggunaan"):
                     if nama and pengguna:
                         new = pd.DataFrame([[nama, "Bahan", f"{jumlah} {satuan}", tanggal, pengguna, keterangan]],
-                                           columns=df_riwayat.columns)
+                                   columns=df_riwayat.columns)
                         df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
                         save_data(df_bahan, df_alat, df_riwayat)
-                        st.success("✅ Penggunaan dicatat.")
+                        st.success(f"✅ Penggunaan dicatat oleh **{pengguna}**.")
                     else:
                         st.error("⚠️ Lengkapi semua data.")
-
+                        
         elif sub_menu == "Peminjaman & Pengembalian Alat":
             st.title("🔄 Peminjaman & Pengembalian Alat")
             if not df_alat.empty:
@@ -187,9 +189,9 @@ elif role in ["Mahasiswa", "Dosen"]:
                         st.error("Jumlah tidak mencukupi.")
                         st.stop()
                     log = pd.DataFrame([[nama_alat, "Alat", jumlah, tanggal, pengguna, f"{aksi}: {keterangan}"]],
-                                       columns=df_riwayat.columns)
+                               columns=df_riwayat.columns)
                     df_riwayat = pd.concat([df_riwayat, log], ignore_index=True)
                     save_data(df_bahan, df_alat, df_riwayat)
-                    st.success(f"✅ Alat berhasil {aksi.lower()}.")
-            else:
+                    st.success(f"✅ Alat berhasil {aksi.lower()} oleh **{pengguna}**.")
+                    
                 st.warning("Belum ada data alat.")
