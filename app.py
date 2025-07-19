@@ -194,7 +194,7 @@ elif role in ["Mahasiswa", "Dosen"]:
                                 idx = df_alat[df_alat["Nama"] == alat].index[0]
 
                                 if aksi == "Pinjam":
-                                    if df_alat.at[idx, "Jumlah"] >= jumlah:
+                                     if df_alat.at[idx, "Jumlah"] >= jumlah:
                                         df_alat.at[idx, "Jumlah"] -= jumlah
                                     else:
                                         st.error(f"Jumlah alat '{alat}' tidak mencukupi.")
@@ -202,14 +202,13 @@ elif role in ["Mahasiswa", "Dosen"]:
                                 elif aksi == "Kembalikan":
                                     df_alat.at[idx, "Jumlah"] += jumlah
 
-                                # Catat log
                                 log = pd.DataFrame([[alat, "Alat", jumlah, tanggal, pengguna, f"{aksi}: {keterangan}"]],
-                                           columns=df_riwayat.columns)
+                                                   columns=df_riwayat.columns)
                                 df_riwayat = pd.concat([df_riwayat, log], ignore_index=True)
                                 success_log.append(alat)
-
-                                if success_log:
-                                    save_data(df_bahan, df_alat, df_riwayat)
-                                    st.success(f"✅ Berhasil {aksi.lower()} alat: {', '.join(success_log)} oleh **{pengguna}**.")
-                        else:
-                            st.warning("Belum ada data alat.")
+    
+                            if success_log:
+                                save_data(df_bahan, df_alat, df_riwayat)
+                                st.success(f"✅ Berhasil {aksi.lower()} alat: {', '.join(success_log)} oleh **{pengguna}**.")
+                    else:
+                        st.warning("Belum ada data alat.")
