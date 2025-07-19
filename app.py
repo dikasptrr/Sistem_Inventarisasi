@@ -147,7 +147,7 @@ elif role in ["Mahasiswa", "Dosen"]:
         st.title("Stok Alat Laboratorium")
         st.dataframe(alat_df)
 
-elif menu == "Logbook Pemakaian":
+    elif menu == "Logbook Pemakaian":
     st.title("Isi Logbook Pemakaian")
     nama = st.text_input("Nama Barang")
     kategori = st.selectbox("Kategori", ["Bahan", "Alat"])
