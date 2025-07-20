@@ -164,7 +164,7 @@ if role == "Laboran":
         st.subheader("Tambah / Hapus Bahan")
         nama = st.text_input("Nama Bahan")
         jumlah = st.number_input("Jumlah", min_value=0.0)
-        satuan = st.selectbox("Satuan", ["g", "ml"])
+        satuan = st.selectbox("Satuan", ["g", "mL"])
         tempat = st.text_input("Tempat Penyimpanan")
         expired = st.date_input("Tanggal Expired", value=date.today())
 
@@ -274,7 +274,7 @@ elif role in ["Mahasiswa", "Dosen"]:
                 nama = st.selectbox("Pilih Bahan", df_bahan["Nama"].unique())
                 kategori = "Penggunaan Bahan Kimia"
                 jumlah = st.number_input("Jumlah", min_value=0.01, step=0.01)
-                satuan = st.selectbox("Satuan", ["g", "ml"])
+                satuan = st.selectbox("Satuan", ["g", "mL"])
                 tanggal = st.date_input("Tanggal", value=date.today())
                 keterangan = st.text_area("Keterangan")
 
