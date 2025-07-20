@@ -192,6 +192,7 @@ elif role in ["Mahasiswa", "Dosen"]:
             st.title(":test_tube: Logbook Penggunaan Bahan Kimia")
             if not df_bahan.empty:
                 nama = st.selectbox("Pilih Bahan", df_bahan["Nama"].unique())
+                kategori = "Penggunaan Bahan Kimia"
                 jumlah = st.number_input("Jumlah", min_value=0.01, step=0.01)
                 satuan = st.selectbox("Satuan", ["g", "ml"])
                 tanggal = st.date_input("Tanggal", value=date.today())
@@ -203,7 +204,6 @@ elif role in ["Mahasiswa", "Dosen"]:
 
                     if stok_saat_ini >= jumlah:
                         df_bahan.at[idx, "Jumlah"] -= jumlah
-                        kategori = "Penggunaan Bahan Kimia"
                         new = pd.DataFrame([[nama, kategori, f"{jumlah} {satuan}", tanggal, pengguna, keterangan]],
                                             columns=df_riwayat.columns)
                         df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
