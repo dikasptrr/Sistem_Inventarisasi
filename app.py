@@ -27,6 +27,13 @@ add_bg_from_local("images/background_lab.jpg")
 # ========== KONFIGURASI ==========
 st.set_page_config(page_title="Inventarisasi Lab Kimia", page_icon="🧪", layout="wide")
 
+# ========== KONFIGURASI USERNAME & PASSWORD LABORAN ==========
+CREDENTIALS = {
+    # username: password
+    "Laboran": "lab1234",
+    "Adminlab": "lab1234"
+}
+
 # === STYLING BARU ===
 # Atur gaya visual
 st.markdown(
@@ -163,13 +170,6 @@ if role == "Laboran":
         st.sidebar.error("❌ Password salah.")
         st.stop()
 
-
-# ========== KONFIGURASI USERNAME & PASSWORD LABORAN ==========
-CREDENTIALS = {
-    # username: password
-    "Laboran": "lab1234",
-    "Adminlab": "lab1234"
-}
 
 # ========== LOAD DATA ==========
 df_bahan, df_alat, df_riwayat = load_data()
