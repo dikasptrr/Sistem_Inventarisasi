@@ -28,26 +28,10 @@ add_bg_from_local("images/background_lab.jpg")
 st.set_page_config(page_title="Inventarisasi Lab Kimia", page_icon="🧪", layout="wide")
 
 # === STYLING BARU ===
-# Atur background dan gaya visual
+# Atur gaya visual
 st.markdown(
     """
     <style>
-    /* Background */
-    .stApp {
-        background-image: url("images/background.jpg");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        color: white !important;
-    }
-
-    /* Card/Container transparency */
-    .block-container {
-        background-color: rgba(0, 0, 0, 0.55);
-        padding: 2rem;
-        border-radius: 15px;
-    }
-
     /* Sidebar */
     section[data-testid="stSidebar"] {
         background-color: rgba(255, 255, 255, 0.85);
