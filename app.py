@@ -139,12 +139,20 @@ if role == "Laboran":
 
     elif menu == "Logbook Pemakaian":
         st.title(":blue_book: Logbook Pemakaian")
+        
         if df_riwayat.empty:
             st.info("Belum ada catatan.")
         else:
-            df_display = df_riwayat.copy().reset_index(drop=True)
+            kategori_terpilih = st.selectbox("Pilih Kategori", ["Semua", "Penggunaan Bahan Kimia", "Peminjaman Alat", "Pengembalian Alat"])
+            
+            df_display = df_riwayat.copy()
+            if kategori_terpilih != "Semua":
+                df_display = df_display[df_display["Kategori"] == kategori_terpilih]
+        
+            df_display = df_display.reset_index(drop=True)
             df_display.index += 1
             df_display.index.name = "No"
+
             st.dataframe(df_display)
 
     elif menu == "Reset Semua Data":
@@ -195,6 +203,7 @@ elif role in ["Mahasiswa", "Dosen"]:
 
                     if stok_saat_ini >= jumlah:
                         df_bahan.at[idx, "Jumlah"] -= jumlah
+                        kategori = "Penggunaan Bahan Kimia"
                         new = pd.DataFrame([[nama, kategori, f"{jumlah} {satuan}", tanggal, pengguna, keterangan]],
                                             columns=df_riwayat.columns)
                         df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
