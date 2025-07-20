@@ -32,24 +32,6 @@ st.set_page_config(page_title="Inventarisasi Lab Kimia", page_icon="🧪", layou
 st.markdown(
     """
     <style>
-
-    /* Font */
-     .stTextInput > div > div > input,
-     .stSelectbox > div > div > div > input,
-     .stDateInput > div > input,
-     .stTextArea textarea {{
-         background-color: rgba(0,0,0,0.5);  /* Transparansi gelap */
-         color: white !important;
-     }}
-
-     .stButton > button {{
-         color: white;
-         background-color: #444444;
-     }}
-
-     h1, h2, h3, h4, h5, h6, p, span {{
-         color: white;
-     }}
     /* Sidebar */
     section[data-testid="stSidebar"] {
         background-color: rgba(255, 255, 255, 0.85);
