@@ -204,8 +204,6 @@ elif role in ["Mahasiswa", "Dosen"]:
 
                     if stok_saat_ini >= jumlah:
                         df_bahan.at[idx, "Jumlah"] -= jumlah
-                        st.write("Kolom df_riwayat:", df_riwayat.columns)
-                        st.write("Jumlah kolom di new data:", len([nama, kategori, f"{jumlah} {satuan}", tanggal, pengguna, keterangan]))
                         new = pd.DataFrame([[nama, kategori, f"{jumlah} {satuan}", tanggal, pengguna, keterangan]],
                                             columns=df_riwayat.columns)
                         df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
