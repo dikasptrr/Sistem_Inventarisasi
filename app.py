@@ -143,21 +143,26 @@ st.sidebar.title("🔑 Login Pengguna")
 role = st.sidebar.selectbox("Pilih Peran", ["Mahasiswa", "Dosen", "Laboran"])
 pengguna = st.sidebar.text_input("Nama Pengguna")
 
-# Jika peran Laboran, minta password
+# Jika Laboran, minta password
 if role == "Laboran":
     password = st.sidebar.text_input("Password", type="password")
 else:
     password = None
 
+# Validasi input login
 if not pengguna:
-    st.sidebar.warning("Masukkan nama pengguna terlebih dahulu.")
+    st.sidebar.warning("⚠️ Masukkan nama pengguna terlebih dahulu.")
     st.stop()
 
+# Validasi password khusus Laboran
 if role == "Laboran":
-    # Validasi password
-    if pengguna not in CREDENTIALS or CREDENTIALS[pengguna] != password:
-        st.sidebar.error("❌ Username atau password salah.")
+    if pengguna not in CREDENTIALS:
+        st.sidebar.error("❌ Username tidak ditemukan.")
         st.stop()
+    elif CREDENTIALS[pengguna] != password:
+        st.sidebar.error("❌ Password salah.")
+        st.stop()
+
 
 # ========== KONFIGURASI USERNAME & PASSWORD LABORAN ==========
 CREDENTIALS = {
