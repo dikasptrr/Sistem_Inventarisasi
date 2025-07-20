@@ -91,11 +91,18 @@ if role == "Laboran":
         expired = st.date_input("Tanggal Expired", value=date.today())
 
         if st.button("Tambah Bahan"):
-            if nama:
-                new = pd.DataFrame([[nama, jumlah, satuan, tempat, expired]], columns=df_bahan.columns)
-                df_bahan = pd.concat([df_bahan, new], ignore_index=True)
+            if not nama or jumlah == 0 or not tempat:
+                st.warning("❗ Harap lengkapi semua kolom terlebih dahulu.")
+            else:
+                if nama in df_bahan["Nama"].values:
+                    idx = df_bahan[df_bahan["Nama"] == nama].index[0]
+                    df_bahan.at[idx, "Jumlah"] += jumlah
+                else:
+                    new = pd.DataFrame([[nama, jumlah, satuan, tempat, expired]], columns=df_bahan.columns)
+                    df_bahan = pd.concat([df_bahan, new], ignore_index=True)
                 save_data(df_bahan, df_alat, df_riwayat)
-                st.success("✅ Bahan berhasil ditambahkan.")
+                st.success("✅ Bahan berhasil ditambahkan atau diperbarui.")
+
 
         if st.button("Hapus Bahan"):
             df_bahan = df_bahan[df_bahan["Nama"] != nama]
@@ -140,13 +147,18 @@ if role == "Laboran":
             df_display.index.name = "No"
             st.dataframe(df_display)
 
-    elif menu == "Reset Semua Data":
-        if st.button("🧹 Reset Semua Data"):
-            df_bahan = pd.DataFrame(columns=df_bahan.columns)
-            df_alat = pd.DataFrame(columns=df_alat.columns)
-            df_riwayat = pd.DataFrame(columns=df_riwayat.columns)
-            save_data(df_bahan, df_alat, df_riwayat)
-            st.success("✅ Semua data berhasil direset.")
+        elif menu == "Reset Semua Data":
+            st.title("🧹 Reset Semua Data")
+            st.warning("⚠️ Tindakan ini akan menghapus **seluruh data bahan, alat, dan logbook** secara permanen.")
+            konfirmasi = st.checkbox("Saya mengerti dan ingin menghapus semua data.")
+
+            if konfirmasi and st.button("Hapus Sekarang"):
+                df_bahan = pd.DataFrame(columns=df_bahan.columns)
+                df_alat = pd.DataFrame(columns=df_alat.columns)
+                df_riwayat = pd.DataFrame(columns=df_riwayat.columns)
+                save_data(df_bahan, df_alat, df_riwayat)
+                st.success("✅ Semua data berhasil direset.")
+
 
 elif role in ["Mahasiswa", "Dosen"]:
     menu = st.sidebar.selectbox("📋 Menu", ["Stok Bahan Kimia", "Stok Alat Laboratorium", "Isi Logbook Pemakaian"])
