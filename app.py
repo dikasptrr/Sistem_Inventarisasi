@@ -6,6 +6,24 @@ from datetime import datetime, date
 # ========== KONFIGURASI ==========
 st.set_page_config(page_title="Inventarisasi Lab Kimia", page_icon="🧪", layout="wide")
 
+import base64
+
+def add_bg_from_local(image_file):
+    with open(image_file, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+    page_bg_img = f"""
+    <style>
+    .stApp {{
+        background-image: url("data:image/jpg;base64,{encoded}");
+        background-size: cover;
+        background-attachment: fixed;
+    }}
+    </style>
+    """
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+    
+add_bg_from_local("images/background_lab.jpg")
+
 # === STYLING TAMBAHAN ===
 st.markdown("""
     <style>
