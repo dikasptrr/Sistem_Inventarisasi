@@ -138,14 +138,7 @@ if role == "Laboran":
             st.success("🗑️ Alat berhasil dihapus.")
 
     elif menu == "Logbook Pemakaian":
-        st.title("📘 Logbook Pemakaian")
-        kategori_terpilih = st.selectbox("Filter berdasarkan kategori:", ["Semua", "Bahan Kimia", "Peminjaman Alat", "Pengembalian Alat"])
-        if kategori_terpilih != "Semua":
-            df_filter = df_riwayat[df_riwayat["Kategori"] == kategori_terpilih]
-        else:
-            df_filter = df_riwayat
-        st.dataframe(df_filter.reset_index(drop=True).style.set_caption("Riwayat Penggunaan"), use_container_width=True)
-
+        st.title(":blue_book: Logbook Pemakaian")
         if df_riwayat.empty:
             st.info("Belum ada catatan.")
         else:
@@ -202,7 +195,7 @@ elif role in ["Mahasiswa", "Dosen"]:
 
                     if stok_saat_ini >= jumlah:
                         df_bahan.at[idx, "Jumlah"] -= jumlah
-                        new = pd.DataFrame([[nama, kategori, jumlah, tanggal, pengguna, f"{satuan} - {keterangan}"]],
+                        new = pd.DataFrame([[nama, "Bahan", jumlah, tanggal, pengguna, f"{satuan} - {keterangan}"]],
                                             columns=df_riwayat.columns)
                         df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
                         save_data(df_bahan, df_alat, df_riwayat)
@@ -239,7 +232,7 @@ elif role in ["Mahasiswa", "Dosen"]:
                         elif aksi == "Kembalikan":
                             df_alat.at[idx, "Jumlah"] += jumlah
 
-                        log = pd.DataFrame([[alat, kategori, jumlah, tanggal, pengguna, f"{aksi}: {keterangan}"]],
+                        log = pd.DataFrame([[alat, "Alat", jumlah, tanggal, pengguna, f"{aksi}: {keterangan}"]],
                                             columns=df_riwayat.columns)
                         df_riwayat = pd.concat([df_riwayat, log], ignore_index=True)
                         success_log.append(alat)
