@@ -162,7 +162,7 @@ if role == "Laboran":
 # ========== KONFIGURASI USERNAME & PASSWORD LABORAN ==========
 CREDENTIALS = {
     # username: password
-    "Laboran": "lab1234"
+    "Laboran": "lab1234",
     "Adminlab": "lab1234"
 }
 
