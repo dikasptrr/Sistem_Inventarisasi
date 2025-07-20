@@ -195,8 +195,8 @@ elif role in ["Mahasiswa", "Dosen"]:
 
                     if stok_saat_ini >= jumlah:
                         df_bahan.at[idx, "Jumlah"] -= jumlah
-                        new = pd.DataFrame([[nama, "Bahan", f"{jumlah} {satuan}", tanggal, pengguna, keterangan]],
-                                           columns=df_riwayat.columns)
+                        new = pd.DataFrame([[nama, "Bahan", jumlah, tanggal, pengguna, f"{satuan} - {keterangan}"]],
+                                            columns=df_riwayat.columns)
                         df_riwayat = pd.concat([df_riwayat, new], ignore_index=True)
                         save_data(df_bahan, df_alat, df_riwayat)
                         st.success(f"✅ Penggunaan dicatat oleh **{pengguna}**. Stok otomatis berkurang.")
