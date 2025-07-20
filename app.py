@@ -147,17 +147,17 @@ if role == "Laboran":
             df_display.index.name = "No"
             st.dataframe(df_display)
 
-        elif menu == "Reset Semua Data":
-            st.title("🧹 Reset Semua Data")
-            st.warning("⚠️ Tindakan ini akan menghapus **seluruh data bahan, alat, dan logbook** secara permanen.")
-            konfirmasi = st.checkbox("Saya mengerti dan ingin menghapus semua data.")
+    elif menu == "Reset Semua Data":
+        st.title("🧹 Reset Semua Data")
+        st.warning("⚠️ Tindakan ini akan menghapus **seluruh data bahan, alat, dan logbook** secara permanen.")
+        konfirmasi = st.checkbox("Saya mengerti dan ingin menghapus semua data.")
 
-            if konfirmasi and st.button("Hapus Sekarang"):
-                df_bahan = pd.DataFrame(columns=df_bahan.columns)
-                df_alat = pd.DataFrame(columns=df_alat.columns)
-                df_riwayat = pd.DataFrame(columns=df_riwayat.columns)
-                save_data(df_bahan, df_alat, df_riwayat)
-                st.success("✅ Semua data berhasil direset.")
+        if konfirmasi and st.button("Hapus Sekarang"):
+            df_bahan = pd.DataFrame(columns=df_bahan.columns)
+            df_alat = pd.DataFrame(columns=df_alat.columns)
+            df_riwayat = pd.DataFrame(columns=df_riwayat.columns)
+            save_data(df_bahan, df_alat, df_riwayat)
+            st.success("✅ Semua data berhasil direset.")
 
 
 elif role in ["Mahasiswa", "Dosen"]:
