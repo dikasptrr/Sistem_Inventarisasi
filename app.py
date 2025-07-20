@@ -44,7 +44,10 @@ st.markdown(
         color: black !important;
         border-radius: 10px;
     }
-
+     label, .stSelectbox label, .stTextInput label, .stRadio label {
+        color: #000000 !important;
+        font-weight: bold;
+    }
     /* Button Styling */
     button[kind="primary"] {
         background-color: #4CAF50;
