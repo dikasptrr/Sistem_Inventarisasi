@@ -154,7 +154,7 @@ if role == "Laboran":
             df_display.index.name = "No"
 
             kolom_utama = ["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "Keterangan"]
-                        df_display = df_display[kolom_utama]
+                            df_display = df_display[kolom_utama]
             st.dataframe(df_display)
 
     elif menu == "Reset Semua Data":
