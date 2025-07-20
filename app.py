@@ -22,10 +22,10 @@ def add_bg_from_local(image_file):
         unsafe_allow_html=True
     )
 
+add_bg_from_local("images/background_lab.jpg")
+
 # ========== KONFIGURASI ==========
 st.set_page_config(page_title="Inventarisasi Lab Kimia", page_icon="🧪", layout="wide")
-
-add_bg_from_local("images/background_lab.jpg")
 
 # === STYLING TAMBAHAN ===
 st.markdown("""
