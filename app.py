@@ -27,6 +27,76 @@ add_bg_from_local("images/background_lab.jpg")
 # ========== KONFIGURASI ==========
 st.set_page_config(page_title="Inventarisasi Lab Kimia", page_icon="🧪", layout="wide")
 
+# === STYLING BARU ===
+# Atur background dan gaya visual
+st.markdown(
+    """
+    <style>
+    /* Background */
+    .stApp {
+        background-image: url("images/background.jpg");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: white !important;
+    }
+
+    /* Card/Container transparency */
+    .block-container {
+        background-color: rgba(0, 0, 0, 0.55);
+        padding: 2rem;
+        border-radius: 15px;
+    }
+
+    /* Sidebar */
+    section[data-testid="stSidebar"] {
+        background-color: rgba(255, 255, 255, 0.85);
+        color: black;
+    }
+
+    /* Selectbox, textinput, etc. */
+    .stSelectbox > div, .stTextInput > div, .stNumberInput > div, .stDateInput > div, .stTextArea > div {
+        background-color: white;
+        color: black !important;
+        border-radius: 10px;
+    }
+
+    /* Button Styling */
+    button[kind="primary"] {
+        background-color: #4CAF50;
+        color: white;
+        border-radius: 10px;
+    }
+    button[kind="primary"]:hover {
+        background-color: #45a049;
+    }
+
+    /* Title and headers */
+    h1, h2, h3, h4 {
+        color: #ffffff;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+    }
+
+    /* Label & Radio */
+    label, .stRadio > div {
+        color: #ffffff !important;
+        font-weight: 500;
+    }
+
+    /* Table header */
+    thead tr th {
+        background-color: #4CAF50 !important;
+        color: white !important;
+    }
+    tbody tr {
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        color: black !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # === STYLING TAMBAHAN ===
 st.markdown("""
     <style>
