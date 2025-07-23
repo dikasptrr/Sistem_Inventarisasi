@@ -25,7 +25,7 @@ def add_bg_from_local(image_file):
 add_bg_from_local("images/background_lab.jpg")
 
 # ========== KONFIGURASI ==========
-st.set_page_config(page_title="Inventarisasi Lab Kimia", page_icon="🧪", layout="wide")
+st.set_page_config(page_title="Log N Stock", page_icon="📦", layout="wide")
 
 # ========== KONFIGURASI USERNAME & PASSWORD LABORAN ==========
 CREDENTIALS = {
