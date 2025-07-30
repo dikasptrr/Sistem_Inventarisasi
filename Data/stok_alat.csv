@@ -1,3 +1,6 @@
-Nama Alat,Jumlah,Tempat Penyimpanan
-Tabung Reaksi,50,Rak 1
-Pipet Ukur,30,Lemari A
+Nama,Spesifikasi,Jumlah,Lokasi
+Mikroskop,"Mikroskop optik merk XYZ, dengan pembesaran 1000x",5,Rak Alat A
+Buret,"Buret kaca ukuran 50 mL, presisi tinggi",10,Gudang Alat 1
+Tabung Reaksi,"Tabung reaksi kaca borosilikat, panjang 15 cm",20,Rak Alat B
+Pipet Tetes,"Pipet plastik disposable, volume 1 mL",15,Gudang Alat 2
+Timbangan Digital,"Timbangan digital merk ABC, kapasitas max 500g",3,Rak Alat A
