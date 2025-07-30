@@ -24,10 +24,10 @@ def add_bg_from_local(image_file):
 
 add_bg_from_local("images/background_lab.jpg")
 
-# ========== KONFIGURASI ==========
+# ========== Judul Tab ==========
 st.set_page_config(page_title="Log N Stock", page_icon="📦", layout="wide")
 
-# === STYLING BARU ===
+# === STYLING ===
 st.markdown(
     """
     <style>
@@ -83,7 +83,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# === STYLING TAMBAHAN ===
 st.markdown("""
     <style>
         [data-testid="stAppViewContainer"] {
