@@ -27,13 +27,6 @@ add_bg_from_local("images/background_lab.jpg")
 # ========== KONFIGURASI ==========
 st.set_page_config(page_title="Log N Stock", page_icon="📦", layout="wide")
 
-# ========== KONFIGURASI USERNAME & PASSWORD LABORAN ==========
-CREDENTIALS = {
-    # username: password
-    "Laboran": "lab1234",
-    "Adminlab": "lab1234"
-}
-
 # === STYLING BARU ===
 # Atur gaya visual
 st.markdown(
@@ -123,6 +116,14 @@ STOK_ALAT = os.path.join(DATA_FOLDER, "stok_alat.csv")
 RIWAYAT = os.path.join(DATA_FOLDER, "riwayat_penggunaan.csv")
 USER_FILE = os.path.join(DATA_FOLDER, "akun_pengguna.csv")
 
+#Akun dummy
+if not os.path.exists(USER_FILE):
+    df_default = pd.DataFrame([
+        {"username": "laboran", "password": "lab1234", "role": "Laboran"},
+        {"username": "mahasiswa", "password": "123", "role": "Mahasiswa"},
+        {"username": "dosen", "password": "123", "role": "Dosen"},
+    ])
+    df_default.to_csv(USER_FILE, index=False)
 # ========== INISIALISASI ==========
 def initialize_file(path, columns):
     if not os.path.exists(path):
