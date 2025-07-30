@@ -203,40 +203,6 @@ if not st.session_state.get("logged_in"):
                 else:
                     st.error("Username sudah digunakan. Gunakan yang lain.")
 
-
-if menu == "🔐 Login Pengguna":
-    st.subheader("🔐 Login Pengguna")
-    username = st.text_input("Username", key="login_username")
-    password = st.text_input("Password", type="password", key="login_password")
-    role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="login_role")
-
-    if st.button("Login"):
-        users = load_users()
-        user_match = users[(users['username'] == username) & (users['password'] == password) & (users['role'] == role)]
-
-        if not user_match.empty:
-            st.success(f"Login berhasil sebagai {role}!")
-            st.session_state.logged_in = True
-            st.session_state.username = username
-            st.session_state.role = role
-        else:
-            st.error("Username, password, atau peran salah!")
-
-elif menu == "👤 Register Akun Baru":
-    st.subheader("👤 Register Akun Baru")
-    new_username = st.text_input("Username", key="register_username")
-    new_password = st.text_input("Password", type="password", key="register_password")
-    new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="register_role")
-
-    if st.button("Register"):
-        if new_username.strip() == "" or new_password.strip() == "":
-            st.warning("Username dan password tidak boleh kosong.")
-        else:
-            if save_user(new_username, new_password, new_role):
-                st.success("Registrasi berhasil! Silakan login.")
-            else:
-                st.error("Username sudah digunakan. Gunakan yang lain.")
-
 # Setelah login berhasil, lanjutkan ke halaman utama
 if st.session_state.get("logged_in"):
     role = st.session_state.get("role")
