@@ -145,32 +145,54 @@ def save_data(df_bahan, df_alat, df_riwayat):
     df_alat.to_csv(STOK_ALAT, index=False)
     df_riwayat.to_csv(RIWAYAT, index=False)
 
-# ========== LOGIN ==========
-st.sidebar.title("🔑 Login Pengguna")
-role = st.sidebar.selectbox("Pilih Peran", ["Mahasiswa", "Dosen", "Laboran"])
-pengguna = st.sidebar.text_input("Nama Pengguna")
+# =========================
+# INISIALISASI DATA & FOLDER
+# =========================
+DATA_FOLDER = "data"
+os.makedirs(DATA_FOLDER, exist_ok=True)
 
-# Jika Laboran, minta password
-if role == "Laboran":
-    password = st.sidebar.text_input("Password", type="password")
-else:
-    password = None
+USERS_FILE = os.path.join(DATA_FOLDER, "users.csv")
+if not os.path.exists(USERS_FILE):
+    df = pd.DataFrame(columns=["username", "password", "role"])
+    df.to_csv(USERS_FILE, index=False)
 
-# Validasi input login
-if not pengguna:
-    st.sidebar.warning("⚠️ Masukkan nama pengguna terlebih dahulu.")
-    st.stop()
+# =========================
+# HALAMAN LOGIN & REGISTER
+# =========================
+st.title("ðŸ§ª Sistem Inventarisasi Laboratorium Kimia")
 
-# Validasi password khusus Laboran
-if role == "Laboran":
-    if pengguna not in CREDENTIALS:
-        st.sidebar.error("❌ Username tidak ditemukan.")
-        st.stop()
-    elif CREDENTIALS[pengguna] != password:
-        st.sidebar.error("❌ Password salah.")
-        st.stop()
+menu = st.sidebar.radio("Navigasi", ["Login", "Register"])
 
+if menu == "Register":
+    st.subheader("ðŸ“ Register Akun Baru")
+    new_user = st.text_input("Username")
+    new_pass = st.text_input("Password", type="password")
+    new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"])
+    if st.button("Daftar"):
+        if new_user and new_pass:
+            users = pd.read_csv(USERS_FILE)
+            if new_user in users["username"].values:
+                st.warning("âš ï¸ Username sudah digunakan.")
+            else:
+                users.loc[len(users)] = [new_user, new_pass, new_role]
+                users.to_csv(USERS_FILE, index=False)
+                st.success("âœ… Akun berhasil dibuat!")
+        else:
+            st.error("âŒ Mohon isi semua kolom.")
 
+elif menu == "Login":
+    st.subheader("ðŸ” Login Pengguna")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("Login"):
+        users = pd.read_csv(USERS_FILE)
+        user_row = users[(users["username"] == username) & (users["password"] == password)]
+        if not user_row.empty:
+            role = user_row.iloc[0]["role"]
+            st.success(f"âœ… Login berhasil sebagai {role}")
+            st.session_state["username"] = username
+            st.session_state["role"] = role
+            
 # ========== LOAD DATA ==========
 df_bahan, df_alat, df_riwayat = load_data()
 
