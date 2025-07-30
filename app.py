@@ -124,7 +124,7 @@ def initialize_file(path, columns):
         pd.DataFrame(columns=columns).to_csv(path, index=False)
 
 initialize_file(STOK_BAHAN, ["Nama", "Jumlah", "Satuan", "Tempat Penyimpanan", "Batch", "Tanggal Masuk", "Tanggal Expired"])
-initialize_file(STOK_ALAT, ["Nama", "Jumlah", "Lokasi"])
+initialize_file(STOK_ALAT, ["Nama", "Spesifikasi", "Jumlah", "Lokasi"])
 initialize_file(RIWAYAT, ["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "Keterangan"])
 initialize_file(USER_FILE, ["username", "password", "role"])  # <- New initialization for users
 
@@ -264,8 +264,11 @@ if st.session_state.get("logged_in"):
 
             st.subheader("Tambah / Hapus Alat")
             nama = st.text_input("Nama Alat")
+            spesifikasi = st.text_area("Spesifikasi Alat (Merk, Ukuran, dll.)")
             jumlah = st.number_input("Jumlah", min_value=0, step=1)
             tempat = st.selectbox("Tempat Penyimpanan", TEMPAT_PENYIMPANAN_ALAT)
+            
+
 
             if st.button("Tambah Alat"):
                 if nama:
@@ -273,7 +276,7 @@ if st.session_state.get("logged_in"):
                         idx = df_alat[df_alat["Nama"] == nama].index[0]
                         df_alat.at[idx, "Jumlah"] += jumlah
                     else:
-                        new = pd.DataFrame([[nama, jumlah, tempat]], columns=df_alat.columns)
+                        new = pd.DataFrame([[nama, spesifikasi, jumlah, tempat]], columns=df_alat.columns)
                         df_alat = pd.concat([df_alat, new], ignore_index=True)
                     save_data(df_bahan, df_alat, df_riwayat)
                     st.success("✅ Alat berhasil ditambahkan atau diperbarui.")
