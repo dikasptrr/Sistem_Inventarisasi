@@ -1,62 +1,7 @@
-import streamlit as st
-import pandas as pd
-import os
-from datetime import date
-import base64
+# ... (semua bagian awal seperti sebelumnya: import, set page config, background, CREDENTIALS, dll)
 
-# ========== KONFIGURASI ==========
-st.set_page_config(page_title="Log N Stock", page_icon="📦", layout="wide")
-
-# ========== FOLDER & FILE SETUP ==========
-DATA_FOLDER = "data"
-os.makedirs(DATA_FOLDER, exist_ok=True)
-
-AKUN_PATH = os.path.join(DATA_FOLDER, "akun_pengguna.csv")
-STOK_BAHAN = os.path.join(DATA_FOLDER, "stok_bahan.csv")
-STOK_ALAT = os.path.join(DATA_FOLDER, "stok_alat.csv")
-RIWAYAT = os.path.join(DATA_FOLDER, "riwayat_penggunaan.csv")
-
-# Inisialisasi file akun jika belum ada
-if not os.path.exists(AKUN_PATH):
-    pd.DataFrame(columns=["username", "password", "role"]).to_csv(AKUN_PATH, index=False)
-
-# Inisialisasi file stok
-def initialize_file(path, columns):
-    if not os.path.exists(path):
-        pd.DataFrame(columns=columns).to_csv(path, index=False)
-
-initialize_file(STOK_BAHAN, ["Nama", "Jumlah", "Satuan", "Tempat Penyimpanan", "Tanggal Expired"])
-initialize_file(STOK_ALAT, ["Nama", "Jumlah", "Lokasi"])
-initialize_file(RIWAYAT, ["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "Keterangan"])
-
-# ========== STYLING ==========
-def add_bg_from_local(image_file):
-    with open(image_file, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode()
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background-image: url("data:image/jpg;base64,{encoded}");
-            background-size: cover;
-            background-attachment: fixed;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-add_bg_from_local("images/background_lab.jpg")
-
-# ========== CREDENTIALS LABORAN (KHUSUS ADMIN) ==========
-CREDENTIALS_LABORAN = {
-    "Laboran": "lab1234",
-    "Adminlab": "lab1234"
-}
-
-# ========== SIDEBAR LOGIN / REGISTER ==========
+# ========== LOGIN / REGISTER ==========
 st.sidebar.title("🔐 Login Sistem")
-
 tab = st.sidebar.radio("Pilih Menu", ["Login", "Register"])
 
 login_status = False
@@ -107,9 +52,60 @@ elif tab == "Register":
                 akun_df.to_csv(AKUN_PATH, index=False)
                 st.sidebar.success(f"Akun '{new_user}' berhasil dibuat!")
 
-# ========== JIKA LOGIN BERHASIL ==========
+# ========== MENU UTAMA ==========
 if login_status:
     st.success(f"Selamat datang, **{login_user}** ({login_role})")
-    # 👉 Di sini kamu bisa lanjutkan ke menu utama kamu berdasarkan `login_role`
+
+    # Load Data
+    df_bahan = pd.read_csv(STOK_BAHAN)
+    df_alat = pd.read_csv(STOK_ALAT)
+    df_riwayat = pd.read_csv(RIWAYAT)
+
+    if login_role == "Laboran":
+        menu = st.sidebar.selectbox("📋 Menu", [
+            "Stok Bahan Kimia", "Stok Alat Laboratorium",
+            "Logbook Pemakaian", "Reset Semua Data"
+        ])
+
+        if menu == "Stok Bahan Kimia":
+            # Tampilkan dan tambah-hapus bahan
+            # (copy paste dari logika kamu sebelumnya)
+            pass
+
+        elif menu == "Stok Alat Laboratorium":
+            # Tampilkan dan tambah-hapus alat
+            pass
+
+        elif menu == "Logbook Pemakaian":
+            # Tampilkan logbook
+            pass
+
+        elif menu == "Reset Semua Data":
+            # Reset data
+            pass
+
+    elif login_role in ["Mahasiswa", "Dosen"]:
+        menu = st.sidebar.selectbox("📋 Menu", [
+            "Stok Bahan Kimia", "Stok Alat Laboratorium",
+            "Isi Logbook Pemakaian"
+        ])
+
+        if menu == "Stok Bahan Kimia":
+            # Tampilkan bahan
+            pass
+
+        elif menu == "Stok Alat Laboratorium":
+            # Tampilkan alat
+            pass
+
+        elif menu == "Isi Logbook Pemakaian":
+            sub_menu = st.radio("Pilih Jenis Logbook", ["Penggunaan Bahan Kimia", "Peminjaman & Pengembalian Alat"])
+            if sub_menu == "Penggunaan Bahan Kimia":
+                # Form catat penggunaan bahan
+                pass
+            elif sub_menu == "Peminjaman & Pengembalian Alat":
+                # Form pinjam/kembalikan alat
+                pass
+
 else:
-    st.warning("Silakan login terlebih dahulu untuk mengakses fitur sistem.")
+    st.warning("Silakan login terlebih dahulu untuk mengakses.")
