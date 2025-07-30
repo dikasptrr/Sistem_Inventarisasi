@@ -1,13 +1,5 @@
 username,password,role
 laboran,lab1234,Laboran
+Admin,12345,Laboran
 mahasiswa,123,Mahasiswa
 dosen,123,Dosen
-
-if not os.path.exists(USER_FILE):
-    df_default = pd.DataFrame([
-        {"username": "laboran", "password": "lab1234", "role": "Laboran"},
-        {"username": "laboran2", "password": "lab5678", "role": "Laboran"},
-        {"username": "mahasiswa", "password": "123", "role": "Mahasiswa"},
-        {"username": "dosen", "password": "123", "role": "Dosen"},
-    ])
-    df_default.to_csv(USER_FILE, index=False)
