@@ -276,7 +276,7 @@ if st.session_state.get("logged_in"):
                         idx = df_alat[df_alat["Nama"] == nama].index[0]
                         df_alat.at[idx, "Jumlah"] += jumlah
                     else:
-                        new = pd.DataFrame([[nama, spesifikasi, jumlah, tempat]], columns=df_alat.columns)
+                        new = pd.DataFrame([[nama, spesifikasi, jumlah, tempat]], columns=["Nama", "Spesifikasi", "Jumlah", "Lokasi"])
                         df_alat = pd.concat([df_alat, new], ignore_index=True)
                     save_data(df_bahan, df_alat, df_riwayat)
                     st.success("✅ Alat berhasil ditambahkan atau diperbarui.")
