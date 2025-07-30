@@ -172,13 +172,13 @@ if menu == "Register":
         if new_user and new_pass:
             users = pd.read_csv(USERS_FILE)
             if new_user in users["username"].values:
-                st.warning("âš ï¸ Username sudah digunakan.")
+                st.warning("Username telah digunakan.")
             else:
                 users.loc[len(users)] = [new_user, new_pass, new_role]
                 users.to_csv(USERS_FILE, index=False)
-                st.success("âœ… Akun berhasil dibuat!")
+                st.success("Akun berhasil dibuat!")
         else:
-            st.error("âŒ Mohon isi semua kolom.")
+            st.error(Mohon isi semua kolom.")
 
 elif menu == "Login":
     st.subheader("👤 Login Pengguna")
@@ -189,7 +189,7 @@ elif menu == "Login":
         user_row = users[(users["username"] == username) & (users["password"] == password)]
         if not user_row.empty:
             role = user_row.iloc[0]["role"]
-            st.success(f"âœ… Login berhasil sebagai {role}")
+            st.success(f"Login berhasil sebagai {role}")
             st.session_state["username"] = username
             st.session_state["role"] = role
 
