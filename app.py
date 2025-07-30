@@ -28,7 +28,6 @@ add_bg_from_local("images/background_lab.jpg")
 st.set_page_config(page_title="Log N Stock", page_icon="📦", layout="wide")
 
 # === STYLING BARU ===
-# Atur gaya visual
 st.markdown(
     """
     <style>
@@ -127,13 +126,14 @@ def initialize_file(path, columns):
 initialize_file(STOK_BAHAN, ["Nama", "Jumlah", "Satuan", "Tempat Penyimpanan", "Batch", "Tanggal Masuk", "Tanggal Expired"])
 initialize_file(STOK_ALAT, ["Nama", "Jumlah", "Lokasi"])
 initialize_file(RIWAYAT, ["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "Keterangan"])
+initialize_file(USER_FILE, ["username", "password", "role"])  # <- New initialization for users
 
 # ========== LOAD & SAVE ==========
 def load_data():
     df_bahan = pd.read_csv(STOK_BAHAN)
-    df_bahan["Jumlah"] = df_bahan["Jumlah"].astype(float)
+    df_bahan["Jumlah"] = df_bahan["Jumlah"].astype(float) if not df_bahan.empty else pd.Series(dtype=float)
     df_alat = pd.read_csv(STOK_ALAT)
-    df_alat["Jumlah"] = df_alat["Jumlah"].astype(int)
+    df_alat["Jumlah"] = df_alat["Jumlah"].astype(int) if not df_alat.empty else pd.Series(dtype=int)
     df_riwayat = pd.read_csv(RIWAYAT)
     return df_bahan, df_alat, df_riwayat
 
@@ -184,7 +184,7 @@ if not st.session_state.get("logged_in"):
                     st.session_state.username = username
                     st.session_state.role = role
                     st.success(f"Login berhasil sebagai {role}!")
-                    st.rerun()
+                    st.experimental_rerun()
                 else:
                     st.error("Username, password, atau peran salah!")
 
@@ -208,11 +208,12 @@ if not st.session_state.get("logged_in"):
 if st.session_state.get("logged_in"):
     role = st.session_state.get("role")
     username = st.session_state.get("username")
+    pengguna = username 
     st.markdown("---")
     st.success(f"Selamat datang, {username} ({role})")
     df_bahan, df_alat, df_riwayat = load_data()
 
-# ========== MENU ==========
+    # ========== MENU ==========
     if role == "Laboran":
         menu = st.sidebar.selectbox("📋 Menu", ["Stok Bahan Kimia", "Stok Alat Laboratorium", "Logbook Pemakaian", "Reset Semua Data"])
 
@@ -236,7 +237,6 @@ if st.session_state.get("logged_in"):
                 if not nama or jumlah == 0 or not tempat:
                     st.warning("❗ Harap lengkapi semua kolom terlebih dahulu.")
                 else:
-                    # Cari batch terakhir
                     if not df_bahan.empty:
                         last_batch = df_bahan["Batch"].max() if "Batch" in df_bahan.columns else 0
                     else:
@@ -249,7 +249,6 @@ if st.session_state.get("logged_in"):
                     df_bahan = pd.concat([df_bahan, new], ignore_index=True)
                     save_data(df_bahan, df_alat, df_riwayat)
                     st.success(f"✅ Bahan batch ke-{batch_number} berhasil ditambahkan.")
-
 
             if st.button("Hapus Bahan"):
                 df_bahan = df_bahan[df_bahan["Nama"] != nama]
@@ -274,7 +273,7 @@ if st.session_state.get("logged_in"):
                         idx = df_alat[df_alat["Nama"] == nama].index[0]
                         df_alat.at[idx, "Jumlah"] += jumlah
                     else:
-                        new = pd.DataFrame([[nama, jumlah, lokasi]], columns=df_alat.columns)
+                        new = pd.DataFrame([[nama, jumlah, tempat]], columns=df_alat.columns)
                         df_alat = pd.concat([df_alat, new], ignore_index=True)
                     save_data(df_bahan, df_alat, df_riwayat)
                     st.success("✅ Alat berhasil ditambahkan atau diperbarui.")
@@ -401,4 +400,3 @@ if st.session_state.get("logged_in"):
                             st.success(f"✅ Berhasil {aksi.lower()} alat: {', '.join(success_log)} oleh **{pengguna}**.")
                         else:
                             st.warning("Belum ada data alat.")
-    
