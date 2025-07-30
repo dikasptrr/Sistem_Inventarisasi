@@ -156,6 +156,7 @@ if not os.path.exists(USERS_FILE):
     df = pd.DataFrame(columns=["username", "password", "role"])
     df.to_csv(USERS_FILE, index=False)
 
+
 # =========================
 # HALAMAN LOGIN & REGISTER
 # =========================
@@ -192,6 +193,71 @@ elif menu == "Login":
             st.success(f"Login berhasil sebagai {role}")
             st.session_state["username"] = username
             st.session_state["role"] = role
+
+# Inisialisasi session state untuk login
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "role" not in st.session_state:
+    st.session_state.role = None
+if "username" not in st.session_state:
+    st.session_state.username = ""
+
+# ==== Fungsi Login ====
+def login():
+    st.markdown("<h2 style='text-align: center;'>🔐 Login Pengguna</h2>", unsafe_allow_html=True)
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("Login"):
+        akun_df = pd.read_csv("data/akun_pengguna.csv")
+        akun = akun_df[(akun_df["Username"] == username) & (akun_df["Password"] == password)]
+        if not akun.empty:
+            st.session_state.logged_in = True
+            st.session_state.username = username
+            st.session_state.role = akun.iloc[0]["Peran"]
+            st.success(f"Login berhasil sebagai {st.session_state.role}")
+            st.experimental_rerun()
+        else:
+            st.error("Username atau password salah.")
+
+# ==== Fungsi Register ====
+def register():
+    st.markdown("<h2 style='text-align: center;'>📝 Register Akun Baru</h2>", unsafe_allow_html=True)
+    username = st.text_input("Username", key="register_user")
+    password = st.text_input("Password", type="password", key="register_pass")
+    peran = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="register_role")
+
+    if st.button("Daftar"):
+        akun_df = pd.read_csv("data/akun_pengguna.csv")
+        if username in akun_df["Username"].values:
+            st.warning("Username sudah terdaftar.")
+        else:
+            akun_baru = pd.DataFrame([[username, password, peran]], columns=["Username", "Password", "Peran"])
+            akun_df = pd.concat([akun_df, akun_baru], ignore_index=True)
+            akun_df.to_csv("data/akun_pengguna.csv", index=False)
+            st.success("Akun berhasil didaftarkan. Silakan login.")
+
+# ==== Tampilan Login/Register atau Menu Utama ====
+if not st.session_state.logged_in:
+    menu = st.sidebar.radio("Menu", ["Login", "Register"])
+    if menu == "Login":
+        login()
+    else:
+        register()
+else:
+    # === Tampilan utama sesuai peran ===
+    st.sidebar.title(f"Selamat datang, {st.session_state.username}")
+    role = st.session_state.role
+    if role == "Laboran":
+        st.header("📦 Menu Laboran")
+        # Tambahkan menu manajemen stok
+    elif role in ["Mahasiswa", "Dosen"]:
+        st.header("📘 Logbook Penggunaan")
+        # Tambahkan fitur logbook
+    if st.sidebar.button("Logout"):
+        st.session_state.logged_in = False
+        st.session_state.role = None
+        st.session_state.username = ""
+        st.experimental_rerun()
 
 # Cek apakah user sudah login
 if "role" not in st.session_state:
