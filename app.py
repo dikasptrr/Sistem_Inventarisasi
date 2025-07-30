@@ -121,6 +121,7 @@ os.makedirs(DATA_FOLDER, exist_ok=True)
 STOK_BAHAN = os.path.join(DATA_FOLDER, "stok_bahan.csv")
 STOK_ALAT = os.path.join(DATA_FOLDER, "stok_alat.csv")
 RIWAYAT = os.path.join(DATA_FOLDER, "riwayat_penggunaan.csv")
+USER_FILE = os.path.join(DATA_FOLDER, "akun_pengguna.csv")
 
 # ========== INISIALISASI ==========
 def initialize_file(path, columns):
@@ -145,36 +146,9 @@ def save_data(df_bahan, df_alat, df_riwayat):
     df_alat.to_csv(STOK_ALAT, index=False)
     df_riwayat.to_csv(RIWAYAT, index=False)
 
-# =========================
-# INISIALISASI DATA & FOLDER
-# =========================
-DATA_FOLDER = "data"
-os.makedirs(DATA_FOLDER, exist_ok=True)
-
-USERS_FILE = os.path.join(DATA_FOLDER, "users.csv")
-if not os.path.exists(USERS_FILE):
-    df = pd.DataFrame(columns=["username", "password", "role"])
-    df.to_csv(USERS_FILE, index=False)
-
-# Path file akun
-DATA_FOLDER = "data"
-USER_FILE = os.path.join(DATA_FOLDER, "akun_pengguna.csv")
-os.makedirs(DATA_FOLDER, exist_ok=True)
-
-# Jika file akun belum ada, buat dengan beberapa data default
-if not os.path.exists(USER_FILE):
-    df_default = pd.DataFrame([
-        {"username": "laboran", "password": "123", "role": "Laboran"},
-        {"username": "mahasiswa", "password": "123", "role": "Mahasiswa"},
-        {"username": "dosen", "password": "123", "role": "Dosen"},
-    ])
-    df_default.to_csv(USER_FILE, index=False)
-
-# Fungsi untuk memuat data akun
 def load_users():
     return pd.read_csv(USER_FILE)
 
-# Fungsi untuk menyimpan user baru
 def save_user(username, password, role):
     df = load_users()
     if username in df['username'].values:
@@ -271,14 +245,6 @@ if st.session_state.get("logged_in"):
     st.success(f"Selamat datang, {username} ({role})")
     # TODO: Tambahkan tampilan sesuai peran di sini (Laboran, Mahasiswa, Dosen)
     # Misal: show_laboran_ui(), show_mahasiswa_ui(), dll
-
-
-# ========== LOAD DATA ==========
-if st.session_state.get("logged_in"):
-    role = st.session_state.get("role")
-    username = st.session_state.get("username")
-    st.markdown("---")
-    st.success(f"Selamat datang, {username} ({role})")
     df_bahan, df_alat, df_riwayat = load_data()
 
 # ========== MENU ==========
