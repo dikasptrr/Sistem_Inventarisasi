@@ -202,7 +202,7 @@ if not st.session_state.get("logged_in"):
         st.subheader("👤 Register Akun Baru")
         new_username = st.text_input("Username", key="register_username")
         new_password = st.text_input("Password", type="password", key="register_password")
-        new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen"], key="register_role")
+        new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="register_role")
 
         if st.button("Register"):
             if new_username.strip() == "" or new_password.strip() == "":
