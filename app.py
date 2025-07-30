@@ -236,7 +236,7 @@ if st.session_state.get("logged_in"):
             nama = st.text_input("Nama Bahan")
             jumlah = st.number_input("Jumlah", min_value=0.0)
             satuan = st.selectbox("Satuan", ["g", "mL"])
-			tempat = st.selectbox("Tempat Penyimpanan", TEMPAT_PENYIMPANAN_BAHAN)
+	    tempat = st.selectbox("Tempat Penyimpanan", TEMPAT_PENYIMPANAN_BAHAN)
             expired = st.date_input("Tanggal Expired", value=date.today())
 
             if st.button("Tambah Bahan"):
