@@ -154,16 +154,6 @@ def save_user(username, password, role):
     df.to_csv(USER_FILE, index=False)
     return True
 
-# === Penambahan Akun Hardcode === 
-if not os.path.exists(USER_FILE):
-    df_default = pd.DataFrame([
-        {"username": "laboran", "password": "lab1234", "role": "Laboran"},
-        {"username": "Admin", "password": "12345", "role": "Laboran"},
-        {"username": "mahasiswa", "password": "123", "role": "Mahasiswa"},
-        {"username": "dosen", "password": "123", "role": "Dosen"},
-    ])
-    df_default.to_csv(USER_FILE, index=False)
-
 # === Tampilan Halaman Login + Register ===
 if not st.session_state.get("logged_in"):
     st.title("📦 Sistem Inventarisasi Laboratorium Kimia")
@@ -231,7 +221,8 @@ if st.session_state.get("logged_in"):
             df_display = df_bahan.copy().reset_index(drop=True)
             df_display.index += 1
             df_display.index.name = "No"
-            df_display = df_display.sort_values(by=["Batch", "Tanggal Masuk"], ascending=[False, False])
+            if "Batch" in df_display.columns and "Tanggal Masuk" in df_display.columns:
+                df_display = df_display.sort_values(by=["Batch", "Tanggal Masuk"], ascending=[False, False])
             st.dataframe(df_display)
 
             st.subheader("Tambah / Hapus Bahan")
