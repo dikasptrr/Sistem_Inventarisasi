@@ -275,7 +275,7 @@ if st.session_state.get("logged_in"):
             st.subheader("Tambah / Hapus Alat")
             nama = st.text_input("Nama Alat")
             jumlah = st.number_input("Jumlah", min_value=0, step=1)
-            tempat = st.selectbox("Tempat Penyimpanan", TEMPAT_PENYIMPANAN_ALAT)
+            lokasi = st.selectbox("Lokasi Penyimpanan", TEMPAT_PENYIMPANAN_ALAT)
 
             if st.button("Tambah Alat"):
                 if nama:
