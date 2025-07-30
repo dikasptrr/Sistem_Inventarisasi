@@ -192,7 +192,16 @@ elif menu == "Login":
             st.success(f"âœ… Login berhasil sebagai {role}")
             st.session_state["username"] = username
             st.session_state["role"] = role
-            
+
+# Cek apakah user sudah login
+if "role" not in st.session_state:
+    st.warning("Silakan login terlebih dahulu.")
+    st.stop()
+
+# Ambil role dan pengguna dari session
+role = st.session_state["role"]
+pengguna = st.session_state["username"]
+
 # ========== LOAD DATA ==========
 df_bahan, df_alat, df_riwayat = load_data()
 
