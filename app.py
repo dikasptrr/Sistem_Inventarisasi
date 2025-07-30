@@ -156,117 +156,82 @@ if not os.path.exists(USERS_FILE):
     df = pd.DataFrame(columns=["username", "password", "role"])
     df.to_csv(USERS_FILE, index=False)
 
+# Path file akun
+DATA_FOLDER = "data"
+USER_FILE = os.path.join(DATA_FOLDER, "akun_pengguna.csv")
+os.makedirs(DATA_FOLDER, exist_ok=True)
 
-# =========================
-# HALAMAN LOGIN & REGISTER
-# =========================
+# Jika file akun belum ada, buat dengan beberapa data default
+if not os.path.exists(USER_FILE):
+    df_default = pd.DataFrame([
+        {"username": "laboran", "password": "123", "role": "Laboran"},
+        {"username": "mahasiswa", "password": "123", "role": "Mahasiswa"},
+        {"username": "dosen", "password": "123", "role": "Dosen"},
+    ])
+    df_default.to_csv(USER_FILE, index=False)
+
+# Fungsi untuk memuat data akun
+def load_users():
+    return pd.read_csv(USER_FILE)
+
+# Fungsi untuk menyimpan user baru
+def save_user(username, password, role):
+    df = load_users()
+    if username in df['username'].values:
+        return False  # Username sudah ada
+    new_user = pd.DataFrame([[username, password, role]], columns=["username", "password", "role"])
+    df = pd.concat([df, new_user], ignore_index=True)
+    df.to_csv(USER_FILE, index=False)
+    return True
+
+# === Tampilan Halaman Login + Register ===
 st.title("📦 Sistem Inventarisasi Laboratorium Kimia")
+st.markdown("---")
 
-menu = st.sidebar.radio("Navigasi", ["Login", "Register"])
+menu = st.radio("Pilih Menu:", ["🔐 Login Pengguna", "👤 Register Akun Baru"])
 
-if menu == "Register":
-    st.subheader("👤 Register Akun Baru")
-    new_user = st.text_input("Username")
-    new_pass = st.text_input("Password", type="password")
-    new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"])
-    if st.button("Daftar"):
-        if new_user and new_pass:
-            users = pd.read_csv(USERS_FILE)
-            if new_user in users["username"].values:
-                st.warning("Username telah digunakan.")
-            else:
-                users.loc[len(users)] = [new_user, new_pass, new_role]
-                users.to_csv(USERS_FILE, index=False)
-                st.success("Akun berhasil dibuat!")
-        else:
-            st.error("Mohon isi semua kolom.")
+if menu == "🔐 Login Pengguna":
+    st.subheader("🔐 Login Pengguna")
+    username = st.text_input("Username", key="login_username")
+    password = st.text_input("Password", type="password", key="login_password")
+    role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="login_role")
 
-elif menu == "Login":
-    st.subheader("👤 Login Pengguna")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
     if st.button("Login"):
-        users = pd.read_csv(USERS_FILE)
-        user_row = users[(users["username"] == username) & (users["password"] == password)]
-        if not user_row.empty:
-            role = user_row.iloc[0]["role"]
-            st.success(f"Login berhasil sebagai {role}")
-            st.session_state["username"] = username
-            st.session_state["role"] = role
+        users = load_users()
+        user_match = users[(users['username'] == username) & (users['password'] == password) & (users['role'] == role)]
 
-# Inisialisasi session state untuk login
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "role" not in st.session_state:
-    st.session_state.role = None
-if "username" not in st.session_state:
-    st.session_state.username = ""
-
-# ==== Fungsi Login ====
-def login():
-    st.markdown("<h2 style='text-align: center;'>🔐 Login Pengguna</h2>", unsafe_allow_html=True)
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        akun_df = pd.read_csv("data/akun_pengguna.csv")
-        akun = akun_df[(akun_df["Username"] == username) & (akun_df["Password"] == password)]
-        if not akun.empty:
+        if not user_match.empty:
+            st.success(f"Login berhasil sebagai {role}!")
             st.session_state.logged_in = True
             st.session_state.username = username
-            st.session_state.role = akun.iloc[0]["Peran"]
-            st.success(f"Login berhasil sebagai {st.session_state.role}")
-            st.experimental_rerun()
+            st.session_state.role = role
         else:
-            st.error("Username atau password salah.")
+            st.error("Username, password, atau peran salah!")
 
-# ==== Fungsi Register ====
-def register():
-    st.markdown("<h2 style='text-align: center;'>📝 Register Akun Baru</h2>", unsafe_allow_html=True)
-    username = st.text_input("Username", key="register_user")
-    password = st.text_input("Password", type="password", key="register_pass")
-    peran = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="register_role")
+elif menu == "👤 Register Akun Baru":
+    st.subheader("👤 Register Akun Baru")
+    new_username = st.text_input("Username", key="register_username")
+    new_password = st.text_input("Password", type="password", key="register_password")
+    new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="register_role")
 
-    if st.button("Daftar"):
-        akun_df = pd.read_csv("data/akun_pengguna.csv")
-        if username in akun_df["Username"].values:
-            st.warning("Username sudah terdaftar.")
+    if st.button("Register"):
+        if new_username.strip() == "" or new_password.strip() == "":
+            st.warning("Username dan password tidak boleh kosong.")
         else:
-            akun_baru = pd.DataFrame([[username, password, peran]], columns=["Username", "Password", "Peran"])
-            akun_df = pd.concat([akun_df, akun_baru], ignore_index=True)
-            akun_df.to_csv("data/akun_pengguna.csv", index=False)
-            st.success("Akun berhasil didaftarkan. Silakan login.")
+            if save_user(new_username, new_password, new_role):
+                st.success("Registrasi berhasil! Silakan login.")
+            else:
+                st.error("Username sudah digunakan. Gunakan yang lain.")
 
-# ==== Tampilan Login/Register atau Menu Utama ====
-if not st.session_state.logged_in:
-    menu = st.sidebar.radio("Menu", ["Login", "Register"])
-    if menu == "Login":
-        login()
-    else:
-        register()
-else:
-    # === Tampilan utama sesuai peran ===
-    st.sidebar.title(f"Selamat datang, {st.session_state.username}")
-    role = st.session_state.role
-    if role == "Laboran":
-        st.header("📦 Menu Laboran")
-        # Tambahkan menu manajemen stok
-    elif role in ["Mahasiswa", "Dosen"]:
-        st.header("📘 Logbook Penggunaan")
-        # Tambahkan fitur logbook
-    if st.sidebar.button("Logout"):
-        st.session_state.logged_in = False
-        st.session_state.role = None
-        st.session_state.username = ""
-        st.experimental_rerun()
+# Setelah login berhasil, lanjutkan ke halaman utama
+if st.session_state.get("logged_in"):
+    role = st.session_state.get("role")
+    username = st.session_state.get("username")
+    st.markdown("---")
+    st.success(f"Selamat datang, {username} ({role})")
+    # TODO: Tambahkan tampilan sesuai peran di sini (Laboran, Mahasiswa, Dosen)
+    # Misal: show_laboran_ui(), show_mahasiswa_ui(), dll
 
-# Cek apakah user sudah login
-if "role" not in st.session_state:
-    st.warning("Silakan login terlebih dahulu.")
-    st.stop()
-
-# Ambil role dan pengguna dari session
-role = st.session_state["role"]
-pengguna = st.session_state["username"]
 
 # ========== LOAD DATA ==========
 df_bahan, df_alat, df_riwayat = load_data()
