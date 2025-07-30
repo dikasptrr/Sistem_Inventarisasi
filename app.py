@@ -164,29 +164,36 @@ if not st.session_state.get("logged_in"):
     st.markdown("---")
     
     menu = st.radio("Pilih Menu:", ["🔐 Login Pengguna", "👤 Register Akun Baru"])
-    
-    if menu == "🔐 Login Pengguna":
-        st.subheader("🔐 Login Pengguna")
-        username = st.text_input("Username", key="login_username")
-        password = st.text_input("Password", type="password", key="login_password")
-        role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="login_role")
 
-        if st.button("Login"):
+    if menu == "🔐 Login Pengguna":
+   	 	st.subheader("🔐 Login Pengguna")
+ 	  	username = st.text_input("Username", key="login_username").strip()
+  		password = st.text_input("Password", type="password", key="login_password").strip()
+		role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="login_role")
+
+    if st.button("Login"):
+        if not username or not password:
+            st.warning("Username dan password harus diisi.")
+        else:
             users = load_users()
+            st.write("Data pengguna:", users)  # Debug: cek data user yang ada
+
             user_match = users[
                 (users['username'] == username) & 
                 (users['password'] == password) & 
                 (users['role'] == role)
             ]
+            st.write("Data cocok login:", user_match)  # Debug untuk filter query
 
             if not user_match.empty:
                 st.session_state.logged_in = True
                 st.session_state.username = username
                 st.session_state.role = role
                 st.success(f"Login berhasil sebagai {role}!")
-                st.rerun()  # menyegarkan halaman agar login form hilang
+                st.rerun()
             else:
                 st.error("Username, password, atau peran salah!")
+
 
     elif menu == "👤 Register Akun Baru":
         st.subheader("👤 Register Akun Baru")
