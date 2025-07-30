@@ -123,6 +123,9 @@ STOK_ALAT = os.path.join(DATA_FOLDER, "stok_alat.csv")
 RIWAYAT = os.path.join(DATA_FOLDER, "riwayat_penggunaan.csv")
 USER_FILE = os.path.join(DATA_FOLDER, "akun_pengguna.csv")
 
+TEMPAT_PENYIMPANAN_BAHAN = ["Lemari 1", "Lemari 2", "Rak A", "Rak B"]
+TEMPAT_PENYIMPANAN_ALAT = ["Gudang Alat 1", "Gudang Alat 2", "Rak Alat A", "Rak Alat B"]
+
 # ========== INISIALISASI ==========
 def initialize_file(path, columns):
     if not os.path.exists(path):
@@ -233,7 +236,7 @@ if st.session_state.get("logged_in"):
             nama = st.text_input("Nama Bahan")
             jumlah = st.number_input("Jumlah", min_value=0.0)
             satuan = st.selectbox("Satuan", ["g", "mL"])
-            tempat = st.text_input("Tempat Penyimpanan")
+			tempat = st.selectbox("Tempat Penyimpanan", TEMPAT_PENYIMPANAN_BAHAN)
             expired = st.date_input("Tanggal Expired", value=date.today())
 
             if st.button("Tambah Bahan"):
@@ -265,7 +268,7 @@ if st.session_state.get("logged_in"):
             st.subheader("Tambah / Hapus Alat")
             nama = st.text_input("Nama Alat")
             jumlah = st.number_input("Jumlah", min_value=0, step=1)
-            lokasi = st.text_input("Lokasi")
+            tempat = st.selectbox("Tempat Penyimpanan", TEMPAT_PENYIMPANAN_ALAT)
 
             if st.button("Tambah Alat"):
                 if nama:
