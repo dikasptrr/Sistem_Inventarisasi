@@ -173,21 +173,26 @@ if not st.session_state.get("logged_in"):
         role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="login_role")
 
         if st.button("Login"):
-            users = load_users()
-            user_match = users[
-                (users['username'] == username) & 
-                (users['password'] == password) & 
-                (users['role'] == role)
-            ]
-
-            if not user_match.empty:
-                st.session_state.logged_in = True
-                st.session_state.username = username
-                st.session_state.role = role
-                st.success(f"Login berhasil sebagai {role}!")
-                st.rerun()  # menyegarkan halaman agar login form hilang
+            if not username or not password:
+                st.warning("Username dan password harus diisi.")
             else:
-                st.error("Username, password, atau peran salah!")
+                users = load_users()
+                user_match = users[
+                    (users['username'] == username) & 
+                    (users['password'] == password) & 
+                    (users['role'] == role)
+                ]
+                st.write("Debug: user_match dataframe:", user_match)  # Debugging
+    
+                if not user_match.empty:
+                    st.session_state.logged_in = True
+                    st.session_state.username = username
+                    st.session_state.role = role
+                    st.success(f"Login berhasil sebagai {role}!")
+                    st.rerun()
+                else:
+                    st.error("Username, password, atau peran salah!")
+
 
     elif menu == "👤 Register Akun Baru":
         st.subheader("👤 Register Akun Baru")
