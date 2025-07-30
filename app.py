@@ -192,16 +192,22 @@ if not st.session_state.get("logged_in"):
         st.subheader("👤 Register Akun Baru")
         new_username = st.text_input("Username", key="register_username")
         new_password = st.text_input("Password", type="password", key="register_password")
-        new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="register_role")
+        # Batasi pilihan role hanya untuk Mahasiswa dan Dosen
+        new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen"], key="register_role")
 
         if st.button("Register"):
             if new_username.strip() == "" or new_password.strip() == "":
                 st.warning("Username dan password tidak boleh kosong.")
             else:
-                if save_user(new_username, new_password, new_role):
-                    st.success("Registrasi berhasil! Silakan login.")
+                # Pastikan role sudah benar (Mahasiswa/Dosen)
+                if new_role not in ["Mahasiswa", "Dosen"]:
+                    st.error("Registrasi hanya diperbolehkan untuk Mahasiswa dan Dosen.")
                 else:
-                    st.error("Username sudah digunakan. Gunakan yang lain.")
+                    if save_user(new_username, new_password, new_role):
+                        st.success("Registrasi berhasil! Silakan login.")
+                    else:
+                        st.error("Username sudah digunakan. Gunakan yang lain.")
+
 
 # Setelah login berhasil, lanjutkan ke halaman utama
 if st.session_state.get("logged_in"):
