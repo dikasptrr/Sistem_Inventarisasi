@@ -27,9 +27,6 @@ add_bg_from_local("images/background_lab.jpg")
 # ========== KONFIGURASI ==========
 st.set_page_config(page_title="Log N Stock", page_icon="📦", layout="wide")
 
-# ========== KONFIGURASI USERNAME & PASSWORD LABORAN ==========
-
-
 # === STYLING BARU ===
 # Atur gaya visual
 st.markdown(
@@ -156,6 +153,16 @@ def save_user(username, password, role):
     df = pd.concat([df, new_user], ignore_index=True)
     df.to_csv(USER_FILE, index=False)
     return True
+
+# === Penambahan Akun Hardcode === 
+if not os.path.exists(USER_FILE):
+    df_default = pd.DataFrame([
+        {"username": "laboran", "password": "lab1234", "role": "Laboran"},
+        {"username": "Admin", "password": "12345", "role": "Laboran"},
+        {"username": "mahasiswa", "password": "123", "role": "Mahasiswa"},
+        {"username": "dosen", "password": "123", "role": "Dosen"},
+    ])
+    df_default.to_csv(USER_FILE, index=False)
 
 # === Tampilan Halaman Login + Register ===
 if not st.session_state.get("logged_in"):
