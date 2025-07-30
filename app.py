@@ -124,7 +124,7 @@ def initialize_file(path, columns):
     if not os.path.exists(path):
         pd.DataFrame(columns=columns).to_csv(path, index=False)
 
-initialize_file(STOK_BAHAN, ["Nama", "Jumlah", "Satuan", "Tempat Penyimpanan", "Tanggal Expired"])
+initialize_file(STOK_BAHAN, ["Nama", "Jumlah", "Satuan", "Tempat Penyimpanan", "Batch", "Tanggal Masuk", "Tanggal Expired])
 initialize_file(STOK_ALAT, ["Nama", "Jumlah", "Lokasi"])
 initialize_file(RIWAYAT, ["Nama", "Kategori", "Jumlah", "Tanggal", "Pengguna", "Keterangan"])
 
@@ -231,6 +231,7 @@ if st.session_state.get("logged_in"):
             df_display = df_bahan.copy().reset_index(drop=True)
             df_display.index += 1
             df_display.index.name = "No"
+            df_display = df_display.sort_values(by=["Batch", "Tanggal Masuk"], ascending=[False, False])
             st.dataframe(df_display)
 
             st.subheader("Tambah / Hapus Bahan")
@@ -244,14 +245,19 @@ if st.session_state.get("logged_in"):
                 if not nama or jumlah == 0 or not tempat:
                     st.warning("❗ Harap lengkapi semua kolom terlebih dahulu.")
                 else:
-                    if nama in df_bahan["Nama"].values:
-                        idx = df_bahan[df_bahan["Nama"] == nama].index[0]
-                        df_bahan.at[idx, "Jumlah"] += jumlah
+                    # Cari batch terakhir
+                    if not df_bahan.empty:
+                        last_batch = df_bahan["Batch"].max() if "Batch" in df_bahan.columns else 0
                     else:
-                        new = pd.DataFrame([[nama, jumlah, satuan, tempat, expired]], columns=df_bahan.columns)
-                        df_bahan = pd.concat([df_bahan, new], ignore_index=True)
+                        last_batch = 0
+                    batch_number = last_batch + 1
+
+                    tanggal_masuk = date.today()
+                    new = pd.DataFrame([[nama, jumlah, satuan, tempat, expired, batch_number, tanggal_masuk]],
+                                       columns=["Nama", "Jumlah", "Satuan", "Tempat Penyimpanan", "Batch", "Tanggal Masuk", "Tanggal Expired"])
+                    df_bahan = pd.concat([df_bahan, new], ignore_index=True)
                     save_data(df_bahan, df_alat, df_riwayat)
-                    st.success("✅ Bahan berhasil ditambahkan atau diperbarui.")
+                    st.success(f"✅ Bahan batch ke-{batch_number} berhasil ditambahkan.")
 
 
             if st.button("Hapus Bahan"):
