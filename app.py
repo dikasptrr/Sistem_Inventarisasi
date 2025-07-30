@@ -27,6 +27,13 @@ add_bg_from_local("images/background_lab.jpg")
 # ========== KONFIGURASI ==========
 st.set_page_config(page_title="Log N Stock", page_icon="📦", layout="wide")
 
+# ========== KONFIGURASI USERNAME & PASSWORD LABORAN ==========
+CREDENTIALS = {
+    # username: password
+    "Laboran": "lab1234",
+    "Adminlab": "lab1234"
+}
+
 # === STYLING BARU ===
 # Atur gaya visual
 st.markdown(
@@ -116,14 +123,6 @@ STOK_ALAT = os.path.join(DATA_FOLDER, "stok_alat.csv")
 RIWAYAT = os.path.join(DATA_FOLDER, "riwayat_penggunaan.csv")
 USER_FILE = os.path.join(DATA_FOLDER, "akun_pengguna.csv")
 
-#Akun dummy
-if not os.path.exists(USER_FILE):
-    df_default = pd.DataFrame([
-        {"username": "laboran", "password": "lab1234", "role": "Laboran"},
-        {"username": "mahasiswa", "password": "123", "role": "Mahasiswa"},
-        {"username": "dosen", "password": "123", "role": "Dosen"},
-    ])
-    df_default.to_csv(USER_FILE, index=False)
 # ========== INISIALISASI ==========
 def initialize_file(path, columns):
     if not os.path.exists(path):
@@ -193,22 +192,16 @@ if not st.session_state.get("logged_in"):
         st.subheader("👤 Register Akun Baru")
         new_username = st.text_input("Username", key="register_username")
         new_password = st.text_input("Password", type="password", key="register_password")
-        # Batasi pilihan role hanya untuk Mahasiswa dan Dosen
-        new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen"], key="register_role")
+        new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="register_role")
 
         if st.button("Register"):
             if new_username.strip() == "" or new_password.strip() == "":
                 st.warning("Username dan password tidak boleh kosong.")
             else:
-                # Pastikan role sudah benar (Mahasiswa/Dosen)
-                if new_role not in ["Mahasiswa", "Dosen"]:
-                    st.error("Registrasi hanya diperbolehkan untuk Mahasiswa dan Dosen.")
+                if save_user(new_username, new_password, new_role):
+                    st.success("Registrasi berhasil! Silakan login.")
                 else:
-                    if save_user(new_username, new_password, new_role):
-                        st.success("Registrasi berhasil! Silakan login.")
-                    else:
-                        st.error("Username sudah digunakan. Gunakan yang lain.")
-
+                    st.error("Username sudah digunakan. Gunakan yang lain.")
 
 # Setelah login berhasil, lanjutkan ke halaman utama
 if st.session_state.get("logged_in"):
