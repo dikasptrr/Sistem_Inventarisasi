@@ -182,21 +182,19 @@ if not st.session_state.get("logged_in"):
                 st.warning("Username dan password harus diisi.")
             else:
                 users = load_users()
-                st.write("Data pengguna:", users)  # Debug: cek user yang ada (hapus jika sudah yakin)
 
                 user_match = users[
                     (users['username'] == username) &
                     (users['password'] == password) &
                     (users['role'] == role)
                 ]
-                st.write("Data cocok login:", user_match)  # Debug filter (hapus juga jika perlu)
 
                 if not user_match.empty:
                     st.session_state.logged_in = True
                     st.session_state.username = username
                     st.session_state.role = role
                     st.success(f"Login berhasil sebagai {role}!")
-                    st.rerun()  # Lebih aman memakai ini daripada st.rerun()
+                    st.rerun()
                 else:
                     st.error("Username, password, atau peran salah!")
 
