@@ -178,7 +178,7 @@ if menu == "Register":
                 users.to_csv(USERS_FILE, index=False)
                 st.success("Akun berhasil dibuat!")
         else:
-            st.error(Mohon isi semua kolom.")
+            st.error("Mohon isi semua kolom.")
 
 elif menu == "Login":
     st.subheader("👤 Login Pengguna")
