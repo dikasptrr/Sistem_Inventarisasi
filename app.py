@@ -28,14 +28,6 @@ add_bg_from_local("images/background_lab.jpg")
 st.set_page_config(page_title="Log N Stock", page_icon="📦", layout="wide")
 
 # ========== KONFIGURASI USERNAME & PASSWORD LABORAN ==========
-if not os.path.exists(USER_FILE):
-    df_default = pd.DataFrame([
-        {"username": "laboran", "password": "12345", "role": "Laboran"},
-        {"username": "Admin", "password": "12345", "role": "Laboran"},
-        {"username": "mahasiswa", "password": "123", "role": "Mahasiswa"},
-        {"username": "dosen", "password": "123", "role": "Dosen"},
-    ])
-    df_default.to_csv(USER_FILE, index=False)
 
 
 # === STYLING BARU ===
