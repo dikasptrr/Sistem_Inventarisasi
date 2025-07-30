@@ -122,6 +122,8 @@ STOK_BAHAN = os.path.join(DATA_FOLDER, "stok_bahan.csv")
 STOK_ALAT = os.path.join(DATA_FOLDER, "stok_alat.csv")
 RIWAYAT = os.path.join(DATA_FOLDER, "riwayat_penggunaan.csv")
 USER_FILE = os.path.join(DATA_FOLDER, "akun_pengguna.csv")
+
+TEMPAT_PENYIMPANAN_BAHAN = ["Lemari 1", "Lemari 2", "Rak A", "Rak B"]
 TEMPAT_PENYIMPANAN_ALAT = ["Gudang Alat 1", "Gudang Alat 2", "Rak Alat A", "Rak Alat B"]
 
 # ========== INISIALISASI ==========
@@ -234,7 +236,7 @@ if st.session_state.get("logged_in"):
             nama = st.text_input("Nama Bahan")
             jumlah = st.number_input("Jumlah", min_value=0.0)
             satuan = st.selectbox("Satuan", ["g", "mL"])
-            tempat = st.selectbox("Tempat Penyimpanan", TEMPAT_PENYIMPANAN_BAHAN)
+	    tempat = st.selectbox("Tempat Penyimpanan", TEMPAT_PENYIMPANAN_BAHAN)
             expired = st.date_input("Tanggal Expired", value=date.today())
 
             if st.button("Tambah Bahan"):
@@ -249,6 +251,7 @@ if st.session_state.get("logged_in"):
                         df_bahan = pd.concat([df_bahan, new], ignore_index=True)
                     save_data(df_bahan, df_alat, df_riwayat)
                     st.success("✅ Bahan berhasil ditambahkan atau diperbarui.")
+
 
             if st.button("Hapus Bahan"):
                 df_bahan = df_bahan[df_bahan["Nama"] != nama]
@@ -274,7 +277,7 @@ if st.session_state.get("logged_in"):
                         df_alat.at[idx, "Jumlah"] += jumlah
                     else:
                         new = pd.DataFrame([[nama, jumlah, lokasi]], columns=df_alat.columns)
-                        df_alat = pd.oncat([df_alat, new], ignore_index=True)
+                        df_alat = pd.concat([df_alat, new], ignore_index=True)
                     save_data(df_bahan, df_alat, df_riwayat)
                     st.success("✅ Alat berhasil ditambahkan atau diperbarui.")
 
@@ -290,8 +293,8 @@ if st.session_state.get("logged_in"):
                st.info("Belum ada catatan.")
             else:
                 kategori_terpilih = st.selectbox("Pilih Kategori", ["Semua", "Penggunaan Bahan Kimia", "Peminjaman Alat", "Pengembalian Alat"])
-               
-		df_display = df_riwayat.copy()
+            
+                df_display = df_riwayat.copy()
                 if kategori_terpilih != "Semua":
                     df_display = df_display[df_display["Kategori"] == kategori_terpilih]
         
