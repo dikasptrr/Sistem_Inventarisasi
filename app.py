@@ -239,7 +239,7 @@ if st.session_state.get("logged_in"):
     username = st.session_state.get("username")
     st.markdown("---")
     st.success(f"Selamat datang, {username} ({role})")
-df_bahan, df_alat, df_riwayat = load_data()
+    df_bahan, df_alat, df_riwayat = load_data()
 
 # ========== MENU ==========
     if role == "Laboran":
