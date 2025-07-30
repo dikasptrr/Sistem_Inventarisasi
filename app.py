@@ -244,7 +244,7 @@ if st.session_state.get("logged_in"):
                     batch_number = last_batch + 1
 
                     tanggal_masuk = date.today()
-                    new = pd.DataFrame([[nama, jumlah, satuan, tempat, expired, batch_number, tanggal_masuk]],
+                    new = pd.DataFrame([[nama, jumlah, satuan, tempat, batch_number, tanggal_masuk, expired]],
                                        columns=["Nama", "Jumlah", "Satuan", "Tempat Penyimpanan", "Batch", "Tanggal Masuk", "Tanggal Expired"])
                     df_bahan = pd.concat([df_bahan, new], ignore_index=True)
                     save_data(df_bahan, df_alat, df_riwayat)
