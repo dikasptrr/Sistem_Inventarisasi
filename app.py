@@ -159,12 +159,12 @@ if not os.path.exists(USERS_FILE):
 # =========================
 # HALAMAN LOGIN & REGISTER
 # =========================
-st.title("ðŸ§ª Sistem Inventarisasi Laboratorium Kimia")
+st.title("📦 Sistem Inventarisasi Laboratorium Kimia")
 
 menu = st.sidebar.radio("Navigasi", ["Login", "Register"])
 
 if menu == "Register":
-    st.subheader("ðŸ“ Register Akun Baru")
+    st.subheader("👤 Register Akun Baru")
     new_user = st.text_input("Username")
     new_pass = st.text_input("Password", type="password")
     new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"])
@@ -181,7 +181,7 @@ if menu == "Register":
             st.error("âŒ Mohon isi semua kolom.")
 
 elif menu == "Login":
-    st.subheader("ðŸ” Login Pengguna")
+    st.subheader("👤 Login Pengguna")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
