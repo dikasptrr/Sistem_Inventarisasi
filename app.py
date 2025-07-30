@@ -4,6 +4,92 @@ import os
 from datetime import datetime, date
 import base64
 
+# === Setup folder data ===
+DATA_FOLDER = "data"
+os.makedirs(DATA_FOLDER, exist_ok=True)
+AKUN_PATH = os.path.join(DATA_FOLDER, "akun_pengguna.csv")
+
+# === Inisialisasi file akun pengguna jika belum ada ===
+if not os.path.exists(AKUN_PATH):
+    akun_df = pd.DataFrame(columns=["username", "password", "role"])
+    akun_df.to_csv(AKUN_PATH, index=False)
+
+# === Akun Laboran (admin manual) ===
+CREDENTIALS = {
+    "laboran": "lab123",
+    "admin": "admin123"
+}
+
+# === Variabel login ===
+login_status = False
+login_user = None
+login_role = None
+
+# === SIDEBAR: Login & Register ===
+st.sidebar.header("🔐 Login Pengguna")
+
+# --- LOGIN ---
+role = st.sidebar.selectbox("Pilih Peran", ["Mahasiswa", "Dosen", "Laboran"])
+username = st.sidebar.text_input("Username")
+password = st.sidebar.text_input("Password", type="password")
+login_button = st.sidebar.button("Login")
+
+# --- REGISTER ---
+st.sidebar.markdown("---")
+st.sidebar.markdown("📝 **Belum punya akun? Daftar di sini**")
+new_user = st.sidebar.text_input("Buat Username Baru")
+new_pass = st.sidebar.text_input("Buat Password Baru", type="password")
+new_role = st.sidebar.selectbox("Daftar Sebagai", ["Mahasiswa", "Dosen"])
+register_button = st.sidebar.button("Daftar Akun")
+
+# === Proses LOGIN ===
+if login_button:
+    if role == "Laboran":
+        if username in CREDENTIALS:
+            if password == CREDENTIALS[username]:
+                login_status = True
+                login_user = username
+                login_role = role
+            else:
+                st.sidebar.error("❌ Password salah.")
+        else:
+            st.sidebar.error("❌ Username tidak ditemukan.")
+    else:
+        akun_df = pd.read_csv(AKUN_PATH)
+        user_data = akun_df[(akun_df["username"] == username) & (akun_df["role"] == role)]
+        if not user_data.empty:
+            if password == user_data.iloc[0]["password"]:
+                login_status = True
+                login_user = username
+                login_role = role
+            else:
+                st.sidebar.error("❌ Password salah.")
+        else:
+            st.sidebar.error("❌ Akun tidak ditemukan.")
+
+# === Proses REGISTER ===
+if register_button:
+    if new_user == "" or new_pass == "":
+        st.sidebar.warning("⚠️ Username dan password tidak boleh kosong.")
+    else:
+        akun_df = pd.read_csv(AKUN_PATH)
+        if new_user in akun_df["username"].values:
+            st.sidebar.warning("⚠️ Username sudah terdaftar, silakan pilih yang lain.")
+        else:
+            new_entry = pd.DataFrame([[new_user, new_pass, new_role]], columns=["username", "password", "role"])
+            akun_df = pd.concat([akun_df, new_entry], ignore_index=True)
+            akun_df.to_csv(AKUN_PATH, index=False)
+            st.sidebar.success(f"✅ Akun '{new_user}' berhasil dibuat sebagai {new_role}!")
+
+# === Setelah login berhasil, tampilkan halaman utama ===
+if login_status:
+    st.success(f"Selamat datang, {login_user} ({login_role})!")
+    # ... tampilkan menu utama sesuai peran ...
+    # Tambahkan kode lanjutan Anda di sini berdasarkan peran
+else:
+    st.warning("Silakan login terlebih dahulu untuk mengakses sistem.")
+
+
 def add_bg_from_local(image_file):
     with open(image_file, "rb") as f:
         data = f.read()
