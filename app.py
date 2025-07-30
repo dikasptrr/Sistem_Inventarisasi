@@ -167,7 +167,15 @@ if not st.session_state.get("logged_in"):
     st.markdown("---")
 
     menu = st.radio("Pilih Menu:", ["🔐 Login Pengguna", "👤 Register Akun Baru"])
-
+    
+if not os.path.exists(USER_FILE):
+    df_default = pd.DataFrame([
+        {"username": "laboran", "password": "lab1234", "role": "Laboran"},
+        {"username": "mahasiswa", "password": "123", "role": "Mahasiswa"},
+        {"username": "dosen", "password": "123", "role": "Dosen"},
+    ])
+    df_default.to_csv(USER_FILE, index=False)
+    
     if menu == "🔐 Login Pengguna":
         st.subheader("🔐 Login Pengguna")
         username = st.text_input("Username", key="login_username").strip()
@@ -201,7 +209,7 @@ if not st.session_state.get("logged_in"):
         st.subheader("👤 Register Akun Baru")
         new_username = st.text_input("Username", key="register_username")
         new_password = st.text_input("Password", type="password", key="register_password")
-        new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="register_role")
+        new_role = st.selectbox("Peran", ["Mahasiswa", "Dosen"], key="register_role")
 
         if st.button("Register"):
             if new_username.strip() == "" or new_password.strip() == "":
