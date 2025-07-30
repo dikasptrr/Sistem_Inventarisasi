@@ -162,38 +162,37 @@ def save_user(username, password, role):
 if not st.session_state.get("logged_in"):
     st.title("📦 Sistem Inventarisasi Laboratorium Kimia")
     st.markdown("---")
-    
+
     menu = st.radio("Pilih Menu:", ["🔐 Login Pengguna", "👤 Register Akun Baru"])
 
     if menu == "🔐 Login Pengguna":
-   	st.subheader("🔐 Login Pengguna")
- 	username = st.text_input("Username", key="login_username").strip()
-  	password = st.text_input("Password", type="password", key="login_password").strip()
-	role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="login_role")
+        st.subheader("🔐 Login Pengguna")
+        username = st.text_input("Username", key="login_username").strip()
+        password = st.text_input("Password", type="password", key="login_password").strip()
+        role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="login_role")
 
-    if st.button("Login"):
-        if not username or not password:
-            st.warning("Username dan password harus diisi.")
-        else:
-            users = load_users()
-            st.write("Data pengguna:", users)  # Debug: cek data user yang ada
-
-            user_match = users[
-                (users['username'] == username) & 
-                (users['password'] == password) & 
-                (users['role'] == role)
-            ]
-            st.write("Data cocok login:", user_match)  # Debug untuk filter query
-
-            if not user_match.empty:
-                st.session_state.logged_in = True
-                st.session_state.username = username
-                st.session_state.role = role
-                st.success(f"Login berhasil sebagai {role}!")
-                st.rerun()
+        if st.button("Login"):
+            if not username or not password:
+                st.warning("Username dan password harus diisi.")
             else:
-                st.error("Username, password, atau peran salah!")
+                users = load_users()
+                st.write("Data pengguna:", users)  # Debug: cek user yang ada (hapus jika sudah yakin)
 
+                user_match = users[
+                    (users['username'] == username) &
+                    (users['password'] == password) &
+                    (users['role'] == role)
+                ]
+                st.write("Data cocok login:", user_match)  # Debug filter (hapus juga jika perlu)
+
+                if not user_match.empty:
+                    st.session_state.logged_in = True
+                    st.session_state.username = username
+                    st.session_state.role = role
+                    st.success(f"Login berhasil sebagai {role}!")
+                    st.experimental_rerun()  # Lebih aman memakai ini daripada st.rerun()
+                else:
+                    st.error("Username, password, atau peran salah!")
 
     elif menu == "👤 Register Akun Baru":
         st.subheader("👤 Register Akun Baru")
@@ -209,6 +208,7 @@ if not st.session_state.get("logged_in"):
                     st.success("Registrasi berhasil! Silakan login.")
                 else:
                     st.error("Username sudah digunakan. Gunakan yang lain.")
+
 
 # Setelah login berhasil, lanjutkan ke halaman utama
 if st.session_state.get("logged_in"):
