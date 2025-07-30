@@ -1,3 +1,9 @@
+import streamlit as st
+import pandas as pd
+import os
+from datetime import date
+import base64
+
 # ... (semua bagian awal seperti sebelumnya: import, set page config, background, CREDENTIALS, dll)
 
 # ========== LOGIN / REGISTER ==========
