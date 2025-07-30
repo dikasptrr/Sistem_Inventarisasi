@@ -184,7 +184,7 @@ if not st.session_state.get("logged_in"):
                 st.session_state.username = username
                 st.session_state.role = role
                 st.success(f"Login berhasil sebagai {role}!")
-                st.experimental_rerun()  # menyegarkan halaman agar login form hilang
+                st.rerun()  # menyegarkan halaman agar login form hilang
             else:
                 st.error("Username, password, atau peran salah!")
 
