@@ -182,7 +182,6 @@ if not st.session_state.get("logged_in"):
                     (users['password'] == password) & 
                     (users['role'] == role)
                 ]
-                st.write("Debug: user_match dataframe:", user_match)  # Debugging
     
                 if not user_match.empty:
                     st.session_state.logged_in = True
