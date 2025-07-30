@@ -166,10 +166,10 @@ if not st.session_state.get("logged_in"):
     menu = st.radio("Pilih Menu:", ["🔐 Login Pengguna", "👤 Register Akun Baru"])
 
     if menu == "🔐 Login Pengguna":
-   	 	st.subheader("🔐 Login Pengguna")
- 	  	username = st.text_input("Username", key="login_username").strip()
-  		password = st.text_input("Password", type="password", key="login_password").strip()
-		role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="login_role")
+   	st.subheader("🔐 Login Pengguna")
+ 	username = st.text_input("Username", key="login_username").strip()
+  	password = st.text_input("Password", type="password", key="login_password").strip()
+	role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="login_role")
 
     if st.button("Login"):
         if not username or not password:
