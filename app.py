@@ -145,6 +145,67 @@ def save_data(df_bahan, df_alat, df_riwayat):
     df_alat.to_csv(STOK_ALAT, index=False)
     df_riwayat.to_csv(RIWAYAT, index=False)
 
+# ========== Inisialisasi ==========
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "role" not in st.session_state:
+    st.session_state.role = None
+if "username" not in st.session_state:
+    st.session_state.username = ""
+
+# ========== FUNGSI LOGIN ==========
+def show_login():
+    st.title("🔐 Login Pengguna")
+
+    username = st.text_input("Username", key="login_username")
+    password = st.text_input("Password", type="password", key="login_password")
+
+    role = st.selectbox("Peran", ["Mahasiswa", "Dosen", "Laboran"], key="login_role")
+    if st.button("Login"):
+        users_df = pd.read_csv("data/users.csv")
+        user = users_df[
+            (users_df["username"] == username) & 
+            (users_df["password"] == password) & 
+            (users_df["role"] == role)
+        ]
+        if not user.empty:
+            st.session_state.logged_in = True
+            st.session_state.role = role
+            st.session_state.username = username
+            st.success(f"Login berhasil sebagai {role}")
+            st.rerun()
+        else:
+            st.error("Login gagal. Cek kembali username, password, dan peran.")
+
+# ========== FUNGSI MENU UTAMA ==========
+def show_main_menu():
+    st.title("📦 Sistem Inventarisasi Laboratorium Kimia")
+    st.success(f"Selamat datang, {st.session_state.username} ({st.session_state.role})")
+
+    if st.button("Logout"):
+        st.session_state.logged_in = False
+        st.session_state.role = None
+        st.session_state.username = ""
+        st.rerun()
+
+    # Tampilkan menu sesuai peran
+    if st.session_state.role == "Laboran":
+        st.subheader("Menu Laboran")
+        # Tambahkan fitur kelola stok, lihat logbook, dll.
+    elif st.session_state.role in ["Mahasiswa", "Dosen"]:
+        st.subheader(f"Menu {st.session_state.role}")
+        # Tambahkan fitur isi logbook, lihat stok, dll.
+
+# ========== APLIKASI ==========
+def main():
+    if not st.session_state.logged_in:
+        show_login()
+    else:
+        show_main_menu()
+
+if __name__ == "__main__":
+    main()
+
 # =========================
 # INISIALISASI DATA & FOLDER
 # =========================
